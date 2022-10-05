@@ -4,9 +4,12 @@ import com.nanum.webfluxservice.alert.application.AlertService;
 import com.nanum.webfluxservice.alert.domain.Alert;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +46,11 @@ public class AlertController {
     @DeleteMapping("/{id}")
     public Mono<Void> deleteAlert(@PathVariable String id){
         return alertService.deleteAlert(id);
+    }
+
+    @GetMapping(value = "/fluxstream", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<Integer> fluxstream(){
+        return Flux.just(1,2,3,4,5).delayElements(Duration.ofSeconds(1)).log();
     }
 
 }

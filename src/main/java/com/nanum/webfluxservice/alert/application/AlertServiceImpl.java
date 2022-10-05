@@ -21,6 +21,7 @@ public class AlertServiceImpl implements AlertService{
 
     @Override
     public Flux<AlertDto> getAlerts() {
+
            return alertRepository.findAll().map(AppUtils::entityToDto);
     }
 
