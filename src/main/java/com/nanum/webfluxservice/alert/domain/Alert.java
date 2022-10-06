@@ -24,15 +24,16 @@ public class Alert {
 
     private String content;
 
-    private List<Long> userIds;
-    private List<Long> readByUserIds;
+    private List<User> users;
 
+    private String url;
 
     @CreatedDate
     private LocalDateTime createAt;
 
-    private List<Long> deletedByUserIds;
-    private LocalDateTime deleteAt;
+
+    private boolean deleteAt;
+
 
 //    private String name;
 //    private int qty;
