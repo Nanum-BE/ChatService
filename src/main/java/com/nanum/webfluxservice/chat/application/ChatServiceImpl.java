@@ -26,4 +26,9 @@ public class ChatServiceImpl implements ChatService{
         return chatRepository.save(chat).map(AppUtils::entityToDto);
     }
 
+    @Override
+    public Flux<ChatDto> connectedRoom(Long roomId) {
+        return chatRepository.mFindByRoomNum(roomId).map(AppUtils::entityToDto);
+    }
+
 }

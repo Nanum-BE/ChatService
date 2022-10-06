@@ -10,7 +10,10 @@ import reactor.core.publisher.Flux;
 public interface ChatRepository extends ReactiveMongoRepository<Chat, String> {
 
     @Tailable // 커서를 안닫고 계속 유지한다.
-    @Query("{sender:?0, receiver:?1}")
-    @Meta(cursorBatchSize = 1024)
-    Flux<Chat> mFindBySender(Long sender, Long receiver);
+    @Query("{senderId:?0, receiverId:?1}")
+    Flux<Chat> mFindBySender(Long senderId, Long receiverId);
+
+    @Tailable // 커서를 안닫고 계속 유지한다.
+    @Query("{roomNum:?0}")
+    Flux<Chat> mFindByRoomNum(Long roomId);
 }

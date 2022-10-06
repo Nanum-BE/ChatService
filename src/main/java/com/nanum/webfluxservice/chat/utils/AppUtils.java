@@ -18,6 +18,7 @@ public class AppUtils {
                 .updateAt(chatDto.getUpdateAt())
                 .deleteAt(chatDto.getDeleteAt())
                 .createAt(chatDto.getCreateAt())
+                .roomNum(chatDto.getRoomNum())
                 .build();
     }
     public static ChatDto entityToDto(Chat chat){
@@ -32,6 +33,7 @@ public class AppUtils {
                 .createAt(chat.getCreateAt())
                 .deleteAt(chat.getDeleteAt())
                 .updateAt(chat.getUpdateAt())
+                .roomNum(chat.getRoomNum())
                 .build();
     }
 }

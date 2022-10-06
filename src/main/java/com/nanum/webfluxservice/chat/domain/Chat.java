@@ -29,6 +29,8 @@ public class Chat {
 
     private boolean read;
 
+    private Long roomNum;
+
     @CreatedDate
     private LocalDateTime createAt;
     @LastModifiedDate

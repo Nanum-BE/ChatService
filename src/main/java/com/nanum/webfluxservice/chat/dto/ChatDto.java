@@ -21,6 +21,7 @@ public class ChatDto {
     private String receiverName;
     private boolean read;
 
+    private Long roomNum;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private LocalDateTime deleteAt;
