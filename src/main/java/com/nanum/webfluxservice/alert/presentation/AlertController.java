@@ -4,6 +4,7 @@ import com.nanum.webfluxservice.alert.application.AlertService;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.alert.utils.AppUtils;
 import com.nanum.webfluxservice.alert.vo.AlertRequest;
+import com.nanum.webfluxservice.alert.vo.AlertResponse;
 import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.config.BaseResponse;
 import lombok.RequiredArgsConstructor;
@@ -60,20 +61,6 @@ public class AlertController {
         return alertService.deleteAlert(id);
     }
 
-    @GetMapping(value = "/fluxstream", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux<Integer> fluxstream(){
-        return Flux.just(1,2,3,4,5).delayElements(Duration.ofSeconds(1)).log();
-    }
-
-
-    @CrossOrigin
-    @GetMapping(value = "/subscribe/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<AlertDto> getSubscribe(@PathVariable("id") Long id,
-                                       @RequestHeader(value = "Last-Event-ID"
-                                               , required = false
-                                                ,defaultValue = "") String lastEventId){
-        return alertService.subscribe(id, lastEventId);
-    }
     @CrossOrigin
     @GetMapping(value = "/user", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<AlertDto> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
@@ -82,18 +69,37 @@ public class AlertController {
     }
 
     @GetMapping("/user/{id}")
-    public Flux<AlertDto> retrieveAlertByUsers(@PathVariable Long id){
-        return alertService.getAlertsByUser(id);
+    public Flux<AlertResponse> retrieveAlertByUsers(@PathVariable Long id){
+        return alertService.getAlertsByUser(id).map(AppUtils::toVo);
     }
-    @GetMapping("/stream-sse")
-    public Flux<ServerSentEvent<String>> streamEvents() {
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(sequence -> ServerSentEvent.<String> builder()
-                        .id(String.valueOf(sequence))
-                        .event("periodic-event")
-                        .data("SSE - " + LocalTime.now().toString())
-                        .build());
+    @GetMapping("/user/{userId}/count")
+    public Mono<Long> getAlertsByUserByCount(@PathVariable("userId") Long userId) {
+       return alertService.getAlertsByUserByCount(userId);
+
     }
 
 
+//    @GetMapping("/stream-sse")
+//    public Flux<ServerSentEvent<String>> streamEvents() {
+//        return Flux.interval(Duration.ofSeconds(1))
+//                .map(sequence -> ServerSentEvent.<String> builder()
+//                        .id(String.valueOf(sequence))
+//                        .event("periodic-event")
+//                        .data("SSE - " + LocalTime.now().toString())
+//                        .build());
+//    }
+//    @GetMapping(value = "/fluxstream", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+//    public Flux<Integer> fluxstream(){
+//        return Flux.just(1,2,3,4,5).delayElements(Duration.ofSeconds(1)).log();
+//    }
+
+
+//    @CrossOrigin
+//    @GetMapping(value = "/subscribe/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public Flux<AlertDto> getSubscribe(@PathVariable("id") Long id,
+//                                       @RequestHeader(value = "Last-Event-ID"
+//                                               , required = false
+//                                                ,defaultValue = "") String lastEventId){
+//        return alertService.subscribe(id, lastEventId);
+//    }
 }

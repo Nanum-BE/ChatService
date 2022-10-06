@@ -11,6 +11,7 @@ public interface AlertService {
     /*
         1. 누구한테 보낼지 선택 생성
         2. 자기거 가져오기 목록
+        3. 읽지 않은 거 카운트 가져오기
         3. 알림 가져오기
         4. 삭제
         자기거 가져오기
@@ -21,6 +22,8 @@ public interface AlertService {
     Mono<AlertDto> getAlert(String id);
 
     Flux<AlertDto> getAlertsByUser(Long userId);
+
+    Mono<Long> getAlertsByUserByCount(Long userId);
     Flux<AlertDto> getAlertInRange(double min, double max);
 
     Mono<AlertDto> saveAlert(Mono<AlertDto> alertDtoMono);
