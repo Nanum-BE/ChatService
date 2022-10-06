@@ -1,17 +1,16 @@
 package com.nanum.webfluxservice.alert.application;
-
-import com.nanum.webfluxservice.alert.domain.Alert;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.alert.infrastructure.AlertRepository;
 import com.nanum.webfluxservice.alert.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.data.domain.Range;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -31,13 +30,26 @@ public class AlertServiceImpl implements AlertService{
     }
 
     @Override
+    public Flux<AlertDto> getAlertsByUser(Long userId) {
+        List<Long> users = new ArrayList<>();
+        users.add(userId);
+
+        return alertRepository.findByUserIdsInAndDeletedByUserIdsNotIn(users,users)
+                .map(AppUtils::entityToDto);
+    }
+
+    @Override
     public Flux<AlertDto> getAlertInRange(double min, double max) {
-        return alertRepository.findByPriceBetween(Range.closed(min, max));
+//        return alertRepository.findByPriceBetween(Range.closed(min, max));
+        return null;
     }
 
     @Override
     public Mono<AlertDto> saveAlert(Mono<AlertDto> alertDtoMono) {
-        return alertDtoMono.map(AppUtils::dtoToEntity)
+        return alertDtoMono.map(alertDto -> {
+                    alertDto.setCreateAt(LocalDateTime.now());
+                    return AppUtils.dtoToEntity(alertDto);
+                })
                 .flatMap(alertRepository::insert)
                 .map(AppUtils::entityToDto);
     }
@@ -69,5 +81,15 @@ public class AlertServiceImpl implements AlertService{
         return alertRepository.deleteById(id);
     }
 
+    @Override
+    public Flux<AlertDto> subscribe(Long id, String lastEventId) {
+        return null;
+    }
+
+    @Override
+    public Flux<AlertDto> connect(List<Long> userId) {
+        return alertRepository.findByUserIdsInAndCreateAtAfter(userId,LocalDateTime.now())
+                .map(AppUtils::entityToDto);
+    }
 
 }

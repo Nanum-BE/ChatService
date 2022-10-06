@@ -10,4 +10,6 @@ public interface ChatService {
     Flux<ChatDto> findBySenderAndReceiver(Long senderId, Long receiverId);
 
     Mono<ChatDto>  chatSave(ChatDto chatDto);
+
+    Flux<ChatDto> connectedRoom(Long roomId);
 }
