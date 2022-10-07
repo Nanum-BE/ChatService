@@ -63,7 +63,7 @@ public class AlertController {
 
     @CrossOrigin
     @GetMapping(value = "/user", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<AlertDto> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
+    public Mono<AlertDto> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
                                             List<Long> params){
         return alertService.connect(params).subscribeOn(Schedulers.boundedElastic());
     }

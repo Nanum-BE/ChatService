@@ -33,25 +33,22 @@ public class AlertServiceImpl implements AlertService{
 
     @Override
     public Flux<AlertDto> getAlertsByUser(Long userId) {
-        List<Long> users = new ArrayList<>();
-//        users.add(userId);
-//        Flux<Alert> alertFlux = alertRepository.findByUserIdsInAndDeletedByUserIdsNotIn(users, users)
-//                .map(AppUtils::entityToDto)
-//                .map(alertDto -> {
-////                    if (alertDto.getReadByUserIds() == null || !alertDto.getReadByUserIds().contains(userId)) {
-////                        List<Long> readByUserIds = new ArrayList<>();
-////                        if (alertDto.getReadByUserIds() != null) {
-////                            readByUserIds = alertDto.getReadByUserIds();
-////                        }
-////                        readByUserIds.add(userId);
-////                        alertDto.setReadByUserIds(readByUserIds);
-////                    }
-//                    return alertDto;
-//                }).map(AppUtils::dtoToEntity);
-//
-//        return   alertRepository.saveAll(alertFlux)
-//                    .map(AppUtils::entityToDto);
-return null;
+
+        Flux<Alert> alertFlux = alertRepository.findAllReadByUsers(userId)
+                .map(AppUtils::entityToDto)
+                .map(alertDto -> {
+                    for (User user : alertDto.getUsers()) {
+                        if (user.getUserId() == userId) {
+                            user.setReadMark(true);
+                        }
+                    }
+                    return alertDto;
+                })
+                .map(AppUtils::dtoToEntity);
+
+        return alertRepository.saveAll(alertFlux)
+                .map(AppUtils::entityToDto);
+
     }
 
     @Override
@@ -119,10 +116,13 @@ return null;
     }
 
     @Override
-    public Flux<AlertDto> connect(List<Long> userId) {
-//        return alertRepository.findByUserIdsInAndCreateAtAfter(userId,LocalDateTime.now())
-//                .map(AppUtils::entityToDto);
-        return null;
+    public Mono<AlertDto> connect(List<Long> userId) {
+        List<User> userEntity = new ArrayList<>();
+        for (Long user: userId) {
+            userEntity.add(User.builder().userId(user).build());
+        }
+        return alertRepository.findByUsersContainsAndCreateAtAfter(userEntity,LocalDateTime.now())
+                .map(AppUtils::entityToDto);
     }
 
 }
