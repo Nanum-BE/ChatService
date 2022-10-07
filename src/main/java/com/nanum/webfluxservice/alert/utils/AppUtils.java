@@ -43,6 +43,7 @@ public class AppUtils {
                 .url(alertDto.getUrl())
                 .createAt(alertDto.getCreateAt())
                 .id(alertDto.getId())
+                .users(alertDto.getUsers())
                 .build();
     }
 }

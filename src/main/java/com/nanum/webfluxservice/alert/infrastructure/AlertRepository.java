@@ -2,21 +2,19 @@ package com.nanum.webfluxservice.alert.infrastructure;
 
 import com.nanum.webfluxservice.alert.domain.Alert;
 
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.repository.Query;
+import com.nanum.webfluxservice.alert.domain.User;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 import org.springframework.data.mongodb.repository.Tailable;
-import org.springframework.data.mongodb.repository.Update;
+
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
+
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Repository
-public interface AlertRepository extends ReactiveMongoRepository<Alert, String> {
+public interface AlertRepository extends ReactiveMongoRepository<Alert, String>,AlertRepositoryCustom{
 //    Flux<AlertDto> findByPriceBetween(Range<Double> priceRange);
 
 
@@ -33,6 +31,6 @@ public interface AlertRepository extends ReactiveMongoRepository<Alert, String> 
 //    Flux<Alert> findByUserIdsInAndDeletedByUserIdsNotIn(List<Long> userIds,List<Long> deletedUsers);
 //    Mono<Long> countByUserIdsInAndDeletedByUserIdsNotInAndReadByUserIdsNotIn(List<Long> userIds
 //            ,List<Long> deletedUsers , List<Long> readUsers);
-
-
+    @Tailable
+    Mono<Alert> findByUsersContainsAndCreateAtAfter(List<User> user, LocalDateTime localDateTime);
 }
