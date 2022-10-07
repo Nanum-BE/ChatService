@@ -22,6 +22,8 @@ public class Alert {
     @Id
     private String id;
 
+    private String title;
+
     private String content;
 
     private List<User> users;

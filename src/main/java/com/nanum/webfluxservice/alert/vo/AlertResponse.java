@@ -12,7 +12,7 @@ import java.util.List;
 public class AlertResponse {
     private String id;
     private String content;
-
+    private String title;
     private List<User> users;
     private String url;
     private LocalDateTime createAt;

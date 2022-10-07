@@ -1,5 +1,6 @@
 package com.nanum.webfluxservice.alert.application;
 
+import com.nanum.webfluxservice.alert.domain.Alert;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,7 +25,6 @@ public interface AlertService {
     Flux<AlertDto> getAlertsByUser(Long userId);
 
     Mono<Long> getAlertsByUserByCount(Long userId);
-    Flux<AlertDto> getAlertInRange(double min, double max);
 
     Mono<AlertDto> saveAlert(Mono<AlertDto> alertDtoMono);
 
@@ -33,6 +33,7 @@ public interface AlertService {
     Mono<Void> deleteAlert(String id);
 
 
+    Flux<Alert> deleteAlertsByIdsFromUser(List<String> id, Long userId);
     Flux<AlertDto> subscribe(Long id, String lastEventId);
 
     Mono<AlertDto> connect(List<Long> userId);

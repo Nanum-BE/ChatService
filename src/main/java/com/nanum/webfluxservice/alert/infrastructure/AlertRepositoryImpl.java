@@ -24,11 +24,15 @@ public class AlertRepositoryImpl implements AlertRepositoryCustom{
         query.fields().include("createAt");
         query.fields().include("url");
         query.fields().include("deleteAt");
-        query.fields().include("users.$");
+        query.fields().include("title");
+        // 해당되는 값만 출력
+//        query.fields().include("users.$");
+
+        query.fields().include("users");
         return reactiveMongoTemplate.find(query,Alert.class);
     }
 
-    public Mono<Long> CountAllReadByUsers(Long userId){
+    public Mono<Long> countAllReadByUsers(Long userId){
         Query query = new Query();
         query.addCriteria(
                 Criteria.where("users").elemMatch(
@@ -36,12 +40,7 @@ public class AlertRepositoryImpl implements AlertRepositoryCustom{
                                 .and("readMark").is(false)
                                 .and("delete").is(false)
                 ));
-        query.fields().include("id");
-        query.fields().include("content");
-        query.fields().include("createAt");
-        query.fields().include("url");
-        query.fields().include("deleteAt");
-        query.fields().include("users.$");
+
         return reactiveMongoTemplate.count(query,Alert.class);
     }
 }
