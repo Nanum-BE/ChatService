@@ -34,47 +34,27 @@ public class AlertServiceImpl implements AlertService{
     @Override
     public Flux<AlertDto> getAlertsByUser(Long userId) {
 
-        Flux<Alert> alertFlux = alertRepository.findAllReadByUsers(userId)
-                .map(AppUtils::entityToDto)
-                .map(alertDto -> {
-                    for (User user : alertDto.getUsers()) {
-                        if (user.getUserId() == userId) {
-                            user.setReadMark(true);
-                        }
-                    }
-                    return alertDto;
-                })
-                .map(AppUtils::dtoToEntity);
-
-        return alertRepository.saveAll(alertFlux)
-                .map(AppUtils::entityToDto);
+        return alertRepository.findAllReadByUsers(userId)
+                        .map(alert -> {
+                            for (User user: alert.getUsers()) {
+                                if(user.getUserId()==userId){
+                                    user.setReadMark(true);
+                                }
+                            }
+                            return alert;
+                        }).flatMap(alertRepository::save)
+                        .map(AppUtils::entityToDto);
 
     }
 
     @Override
     public Mono<Long> getAlertsByUserByCount(Long userId) {
-//        List<Long> users = new ArrayList<>();
-//        users.add(userId);
-//
-//        return  alertRepository.countByUserIdsInAndDeletedByUserIdsNotInAndReadByUserIdsNotIn(users,users,users);
-        return null;
-    }
-
-    @Override
-    public Flux<AlertDto> getAlertInRange(double min, double max) {
-//        return alertRepository.findByPriceBetween(Range.closed(min, max));
-        return null;
+     return alertRepository.countAllReadByUsers(userId);
     }
 
     @Override
     public Mono<AlertDto> saveAlert(Mono<AlertDto> alertDtoMono) {
-        List<Long> initUser = new ArrayList<>();
-        initUser.add(0L);
-        return alertDtoMono.map(alertDto -> {
-                    alertDto.setCreateAt(LocalDateTime.now());
-
-                    return AppUtils.dtoToEntity(alertDto);
-                })
+         return alertDtoMono.map(AppUtils::dtoToEntity)
                 .flatMap(alertRepository::insert)
                 .map(AppUtils::entityToDto);
     }
@@ -108,6 +88,20 @@ public class AlertServiceImpl implements AlertService{
     @Override
     public Mono<Void> deleteAlert(String id) {
         return alertRepository.deleteAll();
+    }
+
+    @Override
+    public Flux<Alert> deleteAlertsByIdsFromUser(List<String> id, Long userId) {
+
+        return alertRepository.findAllById(id)
+                .map(alert -> {
+                    for (User user: alert.getUsers()) {
+                        if(user.getUserId()==userId){
+                            user.setDelete(true);
+                        }
+                    }
+                    return alert;
+                }).flatMap(alertRepository::save);
     }
 
     @Override
