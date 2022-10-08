@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://nanum:spharos1234!@nanum.13yejtj.mongodb.net/?retryWrites=true&w=majority
+      database: nanum
