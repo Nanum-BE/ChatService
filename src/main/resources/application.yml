@@ -1,17 +1,8 @@
-spring:
-  application:
-    name: webFlux-service
-  profiles:
-    include: swagger, eureka
-  data:
-    mongodb:
-      uri: mongodb+srv://nanum:spharos1234!@nanum.13yejtj.mongodb.net/?retryWrites=true&w=majority
-      database: nanum
-
-
 server:
   port: 0
 
-logging:
-  level:
-    com.nanum.supplementaryservice.client: DEBUG
+spring:
+  application:
+    name: web-flux-service
+  profiles:
+    include: mongodb, swagger, eureka
