@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,21 +20,27 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Chat {
+
+public class RoomInfo {
 
     @Id
     private String id;
 
-    private String roomId;
+    private String lastMessage;
 
-    private Long userId;
+    private String lastSentUserId;
 
+    private List<UserInfo> users;
 
-    private String msg;
-
+//    @DocumentReference(lazy = false, lookup = "{ 'primaryRoomInfo': ?#{#self._id}")
+//    @ReadOnlyProperty
+//    private Room room;
 
     @CreatedDate
     private LocalDateTime createAt;
 
-    private boolean delete;
+    @LastModifiedDate
+    private LocalDateTime updateAt;
+
+    private LocalDateTime deleteAt;
 }

@@ -23,7 +23,7 @@ public class AlertRequest {
 
     @NotNull(message = "userIds cannot be null")
     @Size(min = 1)
-    @Schema(description = "해당 유저의 ID값들을 입력하세요.",defaultValue = "1, 2, 3")
+    @Schema(description = "해당 유저의 ID값들을 입력하세요.",defaultValue = "[1, 2, 3]")
     private List<Long> userIds;
 
     @NotNull(message = "url cannot be null")

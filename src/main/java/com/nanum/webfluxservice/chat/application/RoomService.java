@@ -1,0 +1,25 @@
+package com.nanum.webfluxservice.chat.application;
+
+import com.nanum.webfluxservice.chat.dto.RoomDto;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface RoomService {
+
+    /*
+    1. 채팅방 생성
+    2. 채팅방 목록 가져오기
+    3. 유저별 채팅방 가져오기
+    4. 채팅방 삭제
+    5. 채팅방 인원 추가, 또는 나가기
+     */
+    Mono<RoomDto> save(Mono<RoomDto> roomDtoMono);
+
+    Flux<RoomDto> getRooms();
+
+    Flux<RoomDto> getRoomsByUserId(Long userId);
+
+    Mono<RoomDto> deleteRoomByUserId(String id,Long userId);
+
+    Mono<RoomDto> updateRoomByUserId(String id, Long userId);
+}

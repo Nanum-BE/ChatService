@@ -7,9 +7,12 @@ import reactor.core.publisher.Mono;
 
 public interface ChatService {
 
-    Flux<ChatDto> findBySenderAndReceiver(Long senderId, Long receiverId);
+//    Flux<ChatDto> findBySenderAndReceiver(Long senderId, Long receiverId);
 
     Mono<ChatDto>  chatSave(ChatDto chatDto);
 
-    Flux<ChatDto> connectedRoom(Long roomId);
+    Flux<Chat> getChatsByRoom(String houseId);
+
+    Mono<Void> add(String msg,String roomId);
+//    Flux<ChatDto> connectedRoom(Long roomId);
 }

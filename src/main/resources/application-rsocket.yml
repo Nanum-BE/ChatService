@@ -1,0 +1,7 @@
+#spring.rsocket.server.port=7000
+#spring.main.lazy-initialization=true
+
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379

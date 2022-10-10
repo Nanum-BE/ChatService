@@ -25,6 +25,7 @@ import javax.validation.Valid;
 
 import java.util.List;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/alerts")
@@ -42,51 +43,62 @@ public class AlertController {
     private final AlertService alertService;
     @Operation(summary = "알림 전체 조회 API", description = "알림을 모두 출력합니다.")
     @GetMapping
-    public Flux<AlertDto> retrieveAlerts(){
-        return alertService.getAlerts();
+    public ResponseEntity<Flux<AlertDto>> retrieveAlerts(){
+        return ResponseEntity.status(HttpStatus.OK).body(alertService.getAlerts());
     }
 
     @Operation(summary = "알림 상세 조회 API", description = "알림을 하나만 출력합니다.")
     @GetMapping("/{id}")
-    public Mono<AlertDto> retrieveAlert(@PathVariable String id){
-        return alertService.getAlert(id);
+    public Mono<ResponseEntity<AlertDto>> retrieveAlert(@PathVariable String id){
+        return alertService.getAlert(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "알림 생성 API", description = "알림을 해당 관련된 id를 추가하여 알림을 만듭니다.")
     @PostMapping
-    public ResponseEntity<Mono<AlertDto>> saveAlert(@Valid @RequestBody Mono<AlertRequest> alertRequestMono){
+    public Mono<ResponseEntity<AlertDto>> saveAlert(@Valid @RequestBody Mono<AlertRequest> alertRequestMono){
         Mono<AlertDto> alertDtoMono = alertRequestMono.map(AppUtils::voToDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(alertService.saveAlert(alertDtoMono));
+        return alertService.saveAlert(alertDtoMono)
+                .then(Mono.just(new ResponseEntity<AlertDto>(HttpStatus.CREATED)))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     @Operation(summary = "알림 수정 API", description = "알림을 수정합니다.(테스트중)")
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<AlertDto>> updateAlert(@RequestBody Mono<AlertDto> alertDtoMono, @PathVariable String id){
-        return  ResponseEntity.status(HttpStatus.OK).body(alertService.updateAlert(alertDtoMono,id));
+    public Mono<ResponseEntity<AlertDto>> updateAlert(@RequestBody Mono<AlertDto> alertDtoMono, @PathVariable String id){
+        return  alertService.updateAlert(alertDtoMono,id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
     @Operation(summary = "알림 삭제 API", description = "해당 알림을 삭제합니다.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> deleteAlert(@PathVariable String id){
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(alertService.deleteAlert(id));
+    public Mono<ResponseEntity<Void>> deleteAlert(@PathVariable String id){
+        return alertService.deleteAlert(id)
+                .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     @Operation(summary = "알림 기능 받기 API", description = "알림기능을 이용하기 위해 유저와 연결합니다.")
     @CrossOrigin
     @GetMapping(value = "/user", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<Mono<AlertDto>> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
+    public Mono<ResponseEntity<AlertDto>> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
                                             List<Long> params){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(alertService.connect(params).subscribeOn(Schedulers.boundedElastic()));
+        return alertService.connect(params).subscribeOn(Schedulers.boundedElastic())
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
     @Operation(summary = "유저별 알림 전체 조회 API", description = "해당 유저가 볼수 있는 알림을 모두 출력합니다.")
     @GetMapping("/users/{id}")
-    public Flux<AlertResponse> retrieveAlertByUsers(@PathVariable Long id){
-        return alertService.getAlertsByUser(id).map(AppUtils::toVo);
+    public ResponseEntity<Flux<AlertResponse>>  retrieveAlertByUsers(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(alertService.getAlertsByUser(id).map(AppUtils::toVo));
     }
     @Operation(summary = "유저별 알림 개수 조회 API", description = "해당 유저가 못본 알림 개수를 출력합니다.")
     @GetMapping("/count/users/{userId}")
-    public ResponseEntity<Mono<Long>> getAlertsByUserByCount(@PathVariable("userId") Long userId) {
+    public Mono<ResponseEntity<Long>> getAlertsByUserByCount(@PathVariable("userId") Long userId) {
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(alertService.getAlertsByUserByCount(userId));
+        return alertService.getAlertsByUserByCount(userId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
 
     }
     @Operation(summary = "유저별 알림 삭제 API", description = "유저별 원하지 않는 알림을 모두 식제합니다.")
