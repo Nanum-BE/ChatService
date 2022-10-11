@@ -1,6 +1,7 @@
 package com.nanum.webfluxservice.chat.application;
 
 import com.nanum.webfluxservice.chat.domain.Chat;
+import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -31,18 +33,25 @@ public class ChatRoomService implements WebSocketHandler {
     private final RedissonReactiveClient client;
     private final ChatService chatService;
 
+    private final RoomService roomService;
+
+
+
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
 
         log.info("init Handle");
-        String roomId = getChatRoomName(session);
-        Mono<RoomDto> chatRoom = findChatRoom(roomId);
+        HashMap<String, String> uriInfo = getChatRoomName(session);
+        String roomId = uriInfo.get("room");
+        Long userId = Long.valueOf(uriInfo.get("userId"));
+
+        startChatRoom(roomId, userId);
+
         log.info("session.getId()"+session.getId());
-
         log.info("room: "+ roomId);
-        RTopicReactive topic = this.client.getTopic(roomId, StringCodec.INSTANCE);
 
+        RTopicReactive topic = this.client.getTopic(roomId, StringCodec.INSTANCE);
         RListReactive<String> list = this.client.getList("history:" + roomId, StringCodec.INSTANCE);
         Flux<Chat> chatsByRoom = chatService.getChatsByRoom(roomId);
         list.isExists().map(e->{
@@ -55,6 +64,7 @@ public class ChatRoomService implements WebSocketHandler {
         session.receive()
                 .map(WebSocketMessage::getPayloadAsText)
                 .flatMap(msg-> chatService.add(msg,roomId).then(list.add(msg))
+                        .then(roomService.updateCountByRoomIdAndMsg(roomId,msg))
                         .then(topic.publish(msg)))
                 .doOnError(er->log.error(String.valueOf(er)))
                 .doFinally(signalType -> log.info("Subscriber finally "+signalType))
@@ -82,7 +92,11 @@ public class ChatRoomService implements WebSocketHandler {
                 .startWith(list.iterator())
                 .map(session::textMessage)
                 .doOnError(er->log.error(String.valueOf(er)))
-                .doFinally(signalType -> log.info("Publisher finally "+signalType));
+                .doFinally(signalType -> {log.info("Publisher finally "+signalType);
+                    if(signalType.toString()=="cancel"){
+                     roomService.cancelConnectRoomByIdByUserId(roomId,userId);
+                    }
+                });
 
 //        // publisher
 //        Flux<WebSocketMessage> flux = topic.getMessages(String.class)
@@ -96,26 +110,31 @@ public class ChatRoomService implements WebSocketHandler {
         return session.send(flux);
     }
 
-    private Mono<RoomDto> findChatRoom(String roomId) {
-        return null;
+    private Mono<Void> startChatRoom(String roomId, Long userId) {
+         roomService.updatedConnectRoomByIdByUserId(roomId,userId);
+         return null;
     }
 
-    private String getChatRoomName(WebSocketSession session){
+    private HashMap<String,String> getChatRoomName(WebSocketSession session){
 
         log.info("session: "+ session);
         log.info("getHandshakeInfo: "+ session.getHandshakeInfo());
         URI uri = session.getHandshakeInfo().getUri();
         log.info("fromUri: "+ UriComponentsBuilder.fromUri(uri).build());
-        String id = UriComponentsBuilder.fromUri(uri)
+        String userId = UriComponentsBuilder.fromUri(uri)
                 .build()
                 .getQueryParams()
                 .toSingleValueMap()
-                .getOrDefault("room", "default");
-
-        return UriComponentsBuilder.fromUri(uri)
+                .getOrDefault("userId", "default");
+        log.info("userId: "+userId);
+        String roomId = UriComponentsBuilder.fromUri(uri)
                 .build()
                 .getQueryParams()
                 .toSingleValueMap()
                 .getOrDefault("room","default");
+        HashMap<String, String> result = new HashMap<>();
+        result.put("room",roomId);
+        result.put("userId",userId);
+        return result;
     }
 }

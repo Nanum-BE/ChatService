@@ -1,7 +1,7 @@
 package com.nanum.webfluxservice.chat.utils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.nanum.webfluxservice.chat.domain.Chat;
@@ -10,9 +10,7 @@ import com.nanum.webfluxservice.chat.domain.RoomInfo;
 import com.nanum.webfluxservice.chat.domain.UserInfo;
 import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
-import com.nanum.webfluxservice.chat.dto.RoomInfoDto;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,9 +58,8 @@ public class AppUtils {
 
         return RoomDto.builder()
                 .roomName(room.getRoomName())
-                .userIds(room.getUserIds())
+                .roomInfo(room.getRoomInfo())
                 .updateAt(room.getUpdateAt())
-                .roomInfoId(room.getRoomInfoId())
                 .createAt(room.getCreateAt())
                 .deleteAt(room.getDeleteAt())
                 .houseId(room.getHouseId())
@@ -70,86 +67,87 @@ public class AppUtils {
                 .build();
     }
     public static Room dtoToEntity(RoomDto roomDto){
-        System.out.printf("test:"+roomDto.getRoomInfoId());
         return Room.builder()
                 .roomName(roomDto.getRoomName())
-                .userIds(roomDto.getUserIds())
+                .roomInfo(roomDto.getRoomInfo())
                 .updateAt(roomDto.getUpdateAt())
-                .roomInfoId(roomDto.getRoomInfoId())
                 .createAt(roomDto.getCreateAt())
                 .deleteAt(roomDto.getDeleteAt())
                 .houseId(roomDto.getHouseId())
                 .id(roomDto.getId())
                 .build();
     }
-    public static RoomInfoDto entityToDto(RoomInfo roomInfo){
-        return RoomInfoDto.builder()
-                .updateAt(roomInfo.getUpdateAt())
-                .lastSentUserId(roomInfo.getLastSentUserId())
-                .lastMessage(roomInfo.getLastMessage())
-                .createAt(roomInfo.getCreateAt())
-                .deleteAt(roomInfo.getDeleteAt())
-                .id(roomInfo.getId())
-//                .room(roomInfo.getRoom())
-                .users(roomInfo.getUsers())
-                .build();
-    }
-    public static RoomInfo dtoToEntity(RoomInfoDto roomInfoDto){
-        return RoomInfo.builder()
-                .updateAt(roomInfoDto.getUpdateAt())
-                .lastSentUserId(roomInfoDto.getLastSentUserId())
-                .lastMessage(roomInfoDto.getLastMessage())
-                .createAt(roomInfoDto.getCreateAt())
-                .deleteAt(roomInfoDto.getDeleteAt())
-                .id(roomInfoDto.getId())
-//                .room(roomInfoDto.getRoom())
-                .users(roomInfoDto.getUsers())
-                .build();
-    }
-    public static RoomInfo toEntity(RoomDto roomDto){
+//    public static RoomInfoDto entityToDto(RoomInfo roomInfo){
+//        return RoomInfoDto.builder()
+//                .lastSentUserId(roomInfo.getLastSentUserId())
+//                .lastMessage(roomInfo.getLastMessage())
+//                .users(roomInfo.getUsers())
+//                .build();
+//    }
+//    public static RoomInfo dtoToEntity(RoomInfoDto roomInfoDto){
+//        return RoomInfo.builder()
+//                .lastSentUserId(roomInfoDto.getLastSentUserId())
+//                .lastMessage(roomInfoDto.getLastMessage())
+//                .users(roomInfoDto.getUsers())
+//                .build();
+//    }
+//    public static RoomInfo toEntity(RoomDto roomDto){
+//        List<UserInfo> users = new ArrayList<>();
+//        for (Long userId:roomDto.getRoomInfo().getUsers().) {
+//            users.add(UserInfo.builder()
+//                    .userId(userId)
+//                    .readCount(0)
+//                    .delete(false)
+//                    .build());
+//        }
+//        return RoomInfo.builder()
+//                .updateAt(null)
+//                .lastSentUserId(null)
+//                .lastMessage(null)
+//                .createAt(null)
+//                .deleteAt(null)
+//                .users(users)
+//                .build();
+//    }
+//    public static Mono<RoomInfoDto> toEntity(Mono<RoomDto> roomDto1){
+//        List<UserInfo> users = new ArrayList<>();
+//        return   roomDto1.map(roomDto -> {
+//            for (Long userId:roomDto.getUserIds()) {
+//                users.add(UserInfo.builder()
+//                        .userId(userId)
+//                        .readCount(0)
+//                        .delete(false)
+//                        .build());
+//            }
+//            return RoomInfoDto.builder()
+//                    .updateAt(null)
+//                    .lastSentUserId(null)
+//                    .lastMessage(null)
+//                    .createAt(null)
+//                    .deleteAt(null)
+//                    .users(users)
+//                    .build();
+//        });
+//    }
+    public static RoomDto voToDto(RoomRequest roomRequest){
         List<UserInfo> users = new ArrayList<>();
-        for (Long userId:roomDto.getUserIds()) {
+        for (Long userId:roomRequest.getUserIds()) {
             users.add(UserInfo.builder()
                     .userId(userId)
                     .readCount(0)
-                    .delete(false)
+                    .connect(false)
                     .build());
         }
-        return RoomInfo.builder()
-                .updateAt(null)
-                .lastSentUserId(null)
+        RoomInfo roomInfo = RoomInfo.builder()
                 .lastMessage(null)
-                .createAt(null)
-                .deleteAt(null)
+                .lastSentUserId(null)
                 .users(users)
+                .lastSentUserName(null)
                 .build();
-    }
-    public static Mono<RoomInfoDto> toEntity(Mono<RoomDto> roomDto1){
-        List<UserInfo> users = new ArrayList<>();
-        return   roomDto1.map(roomDto -> {
-            for (Long userId:roomDto.getUserIds()) {
-                users.add(UserInfo.builder()
-                        .userId(userId)
-                        .readCount(0)
-                        .delete(false)
-                        .build());
-            }
-            return RoomInfoDto.builder()
-                    .updateAt(null)
-                    .lastSentUserId(null)
-                    .lastMessage(null)
-                    .createAt(null)
-                    .deleteAt(null)
-                    .users(users)
-                    .build();
-        });
-    }
-    public static RoomDto voToDto(RoomRequest roomRequest){
         return RoomDto.builder()
                 .houseId(roomRequest.getHouseId())
-                .userIds(roomRequest.getUserIds())
+                .roomInfo(roomInfo)
                 .roomName(roomRequest.getRoomName())
-                .roomInfoId(null)
                 .build();
     }
 }

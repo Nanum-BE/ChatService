@@ -8,5 +8,5 @@ import lombok.Data;
 public class UserInfo {
     private Long userId;
     private int readCount;
-    private boolean delete;
+    private boolean connect;
 }

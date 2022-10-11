@@ -2,9 +2,12 @@ package com.nanum.webfluxservice.chat.presentaion;
 
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.chat.application.RoomService;
+import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import com.nanum.webfluxservice.chat.utils.AppUtils;
+
+import com.nanum.webfluxservice.chat.utils.SSeServiceImpl;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,12 +17,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import javax.validation.Valid;
+import java.time.Duration;
+import java.time.LocalTime;
 
 
 @RestController
@@ -37,7 +45,7 @@ import javax.validation.Valid;
 public class RoomController {
 
     private final RoomService roomService;
-
+    private final SSeServiceImpl sse;
     @Operation(summary = "채팅방 생성 API", description = "채팅을 해당 관련된 id를 추가하여 채팅을 만듭니다.")
     @PostMapping
     public Mono<ResponseEntity<RoomDto>> saveRoom(@Valid @RequestBody Mono<RoomRequest> roomRequestMono){
@@ -76,5 +84,16 @@ public class RoomController {
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+    @CrossOrigin
+    @GetMapping(value = "/sse/{userId}")
+    public Flux<ServerSentEvent<Room>> streamEvents(@PathVariable("userId") Long userId) {
 
+      return  sse.wrap(roomService.findAllBySSE(userId));
+//        return Flux.interval(Duration.ofSeconds(1))
+//                .map(sequence -> ServerSentEvent.<String> builder()
+//                        .id(String.valueOf(sequence))
+//                        .event("ev")
+//                        .data("SSE - " + LocalTime.now().toString())
+//                        .build());
+    }
 }
