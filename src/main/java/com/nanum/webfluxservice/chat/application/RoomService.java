@@ -1,5 +1,6 @@
 package com.nanum.webfluxservice.chat.application;
 
+import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,6 +16,8 @@ public interface RoomService {
      */
     Mono<RoomDto> save(Mono<RoomDto> roomDtoMono);
 
+    Mono<Void> updatedConnectRoomByIdByUserId(String id, Long userId);
+    Mono<Void> cancelConnectRoomByIdByUserId(String id, Long userId);
     Flux<RoomDto> getRooms();
 
     Flux<RoomDto> getRoomsByUserId(Long userId);
@@ -22,4 +25,8 @@ public interface RoomService {
     Mono<RoomDto> deleteRoomByUserId(String id,Long userId);
 
     Mono<RoomDto> updateRoomByUserId(String id, Long userId);
+
+    Mono<Void> updateCountByRoomIdAndMsg(String id,String msg);
+
+    public Flux<Room> findAllBySSE(Long userId);
 }

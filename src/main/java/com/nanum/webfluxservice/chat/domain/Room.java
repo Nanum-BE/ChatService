@@ -23,7 +23,7 @@ public class Room {
 
     @Id
     private String id;
-    private List<Long> userIds;
+//    private List<Long> userIds;
 
     private Long houseId;
     private String roomName;
@@ -31,7 +31,7 @@ public class Room {
 //    @DocumentReference(lazy = false)
 //    private RoomInfo roomInfoId;
     //    @DocumentReference(lazy = true)
-    private String roomInfoId;
+    private RoomInfo roomInfo;
     @CreatedDate
     private LocalDateTime createAt;
 

@@ -14,16 +14,16 @@ import java.util.List;
 @Builder
 public class RoomInfoDto {
 
-    private String id;
+//    private String id;
     private String lastMessage;
     private String lastSentUserId;
 
 //    private Room room;
     private List<UserInfo> users;
 
-    private LocalDateTime createAt;
-
-    private LocalDateTime updateAt;
-
-    private LocalDateTime deleteAt;
+//    private LocalDateTime createAt;
+//
+//    private LocalDateTime updateAt;
+//
+//    private LocalDateTime deleteAt;
 }

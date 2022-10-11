@@ -5,8 +5,13 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 public interface RoomRepository extends ReactiveMongoRepository<Room, String>, RoomRepositoryCustom {
 
-    Flux<Room> findAllByUserIdsIn(Long userId);
+    Flux<Room> findAllByRoomInfoUsersUserIdOrderByUpdateAtDesc(Long userId);
 //    Flux<Room> findAllByUserIdsInAn(Long userId);
+
+
+
 }

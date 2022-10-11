@@ -1,6 +1,7 @@
 package com.nanum.webfluxservice.chat.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.domain.RoomInfo;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +15,9 @@ import java.util.List;
 @Builder
 public class RoomDto {
     private String id;
-    private List<Long> userIds;
+//    private List<Long> userIds;
     private String roomName;
-    private String roomInfoId;
+    private RoomInfo roomInfo;
     private Long houseId;
     private LocalDateTime createAt;
 
