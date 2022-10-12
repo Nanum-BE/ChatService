@@ -28,5 +28,7 @@ public interface RoomService {
 
     Mono<Void> updateCountByRoomIdAndMsg(String id,String msg);
 
+    Mono<Void> updateCountByRoomIdAndMsgAndSendSSE(String id,String msg);
+
     public Flux<Room> findAllBySSE(Long userId);
 }
