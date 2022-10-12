@@ -3,6 +3,10 @@ package com.nanum.webfluxservice.chat.application;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.nanum.webfluxservice.alert.application.AlertService;
+import com.nanum.webfluxservice.alert.domain.Alert;
+import com.nanum.webfluxservice.alert.dto.AlertDto;
+import com.nanum.webfluxservice.alert.vo.AlertRequest;
 import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.domain.UserInfo;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
@@ -17,7 +21,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -27,6 +33,8 @@ public class RoomServiceImpl implements RoomService{
 
     private final RoomRepository roomRepository;
     private final ChatRepository chatRepository;
+
+    private final AlertService alertService;
     @Override
     public Mono<RoomDto> save(Mono<RoomDto> roomDtoMono) {
         return roomDtoMono.map(AppUtils::dtoToEntity)
@@ -172,5 +180,48 @@ public class RoomServiceImpl implements RoomService{
                     }
                     return room;
                 }).flatMap(roomRepository::save).then();
+    }
+
+    @Override
+    public Mono<Void> updateCountByRoomIdAndMsgAndSendSSE(String id, String msg) {
+        JsonObject jsonObject = (JsonObject) JsonParser.parseString(msg);
+        Gson gson = new Gson();
+        Map<String, Object> map = new HashMap();
+        Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
+        Long sender = Long.valueOf(fromJson.get("sender").toString());
+        String senderName = fromJson.get("senderName").toString();
+        String message = fromJson.get("message").toString();
+        Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
+                .map(room -> {
+                    log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
+                    room.getRoomInfo().setLastMessage(message);
+                    room.getRoomInfo().setLastSentUserId(sender);
+                    room.getRoomInfo().setLastSentUserName(senderName);
+                    for (int i = 0; i < room.getRoomInfo().getUsers().size(); i++) {
+                        if (!room.getRoomInfo().getUsers().get(i).isConnect()) {
+                            UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
+                            changeUserInfo.setReadCount(changeUserInfo.getReadCount() + 1);
+                            room.getRoomInfo().getUsers().set(i, changeUserInfo);
+                        }
+                    }
+                    return room;
+                }).flatMap(roomRepository::save)
+                .map(room -> {
+                    List<Long> userIds = new ArrayList<>();
+                    for (int i = 0; i < room.getRoomInfo().getUsers().size(); i++) {
+                        if (!room.getRoomInfo().getUsers().get(i).isConnect()) {
+                            userIds.add(room.getRoomInfo().getUsers().get(i).getUserId());
+                        }
+                    }
+                    AlertRequest alertRequest = AlertRequest.builder()
+                            .content(room.toString())
+                            .title("채팅")
+                            .userIds(userIds)
+                            .url("http://~~")
+                            .build();
+                    AlertDto alertDto = com.nanum.webfluxservice.alert.utils.AppUtils.voToDto(alertRequest);
+                    return alertDto;
+                });
+        return alertService.saveAlert(alertDtoMono).then();
     }
 }

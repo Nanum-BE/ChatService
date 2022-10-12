@@ -79,7 +79,7 @@ public class AlertController {
     }
     @Operation(summary = "알림 기능 받기 API", description = "알림기능을 이용하기 위해 유저와 연결합니다.")
     @CrossOrigin
-    @GetMapping(value = "/user", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/users", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Mono<ResponseEntity<AlertDto>> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
                                             List<Long> params){
         return alertService.connect(params).subscribeOn(Schedulers.boundedElastic())
