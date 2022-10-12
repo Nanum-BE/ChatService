@@ -18,24 +18,25 @@ import java.time.LocalDateTime;
 public class ChatController {
     private final ChatService chatService;
 
-    @CrossOrigin
-    @GetMapping(value = "/sender/{sender}/receiver/{receiver}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ChatDto> getMsg(@PathVariable("sender") Long sender, @PathVariable("receiver") Long receiver){
-        return chatService.findBySenderAndReceiver(sender,receiver).subscribeOn(Schedulers.boundedElastic());
-    }
+//    @CrossOrigin
+//    @GetMapping(value = "/sender/{sender}/receiver/{receiver}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public Flux<ChatDto> getMsg(@PathVariable("sender") Long sender, @PathVariable("receiver") Long receiver){
+//        return chatService.findBySenderAndReceiver(sender,receiver).subscribeOn(Schedulers.boundedElastic());
+//    }
+//
+//    @CrossOrigin
+//    @GetMapping(value = "/room/{roomId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public Flux<ChatDto> chat(@PathVariable("roomId") Long roomId){
+//        return chatService.connectedRoom(roomId).subscribeOn(Schedulers.boundedElastic());
+//    }
 
-    @CrossOrigin
-    @GetMapping(value = "/room/{roomId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ChatDto> chat(@PathVariable("roomId") Long roomId){
-        return chatService.connectedRoom(roomId).subscribeOn(Schedulers.boundedElastic());
-    }
 
 
     @CrossOrigin
     @PostMapping
     public Mono<ChatDto> setMsg(@RequestBody ChatDto chatDto){
         chatDto.setCreateAt(LocalDateTime.now());
-        chatDto.setUpdateAt(LocalDateTime.now());
+
         return chatService.chatSave(chatDto);
     }
 

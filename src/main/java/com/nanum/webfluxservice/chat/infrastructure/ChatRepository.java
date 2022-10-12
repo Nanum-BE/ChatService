@@ -8,13 +8,18 @@ import org.springframework.data.mongodb.repository.Tailable;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 @Repository
-public interface ChatRepository extends ReactiveMongoRepository<Chat, String> {
+public interface ChatRepository extends ReactiveMongoRepository<Chat, String>,ChatRepositoryCustom {
 
-    @Tailable // 커서를 안닫고 계속 유지한다.
-    @Query("{senderId:?0, receiverId:?1}")
-    Flux<Chat> mFindBySender(Long senderId, Long receiverId);
+//    @Tailable // 커서를 안닫고 계속 유지한다.
+//    @Query("{senderId:?0, receiverId:?1}")
+//    Flux<Chat> mFindBySender(Long senderId, Long receiverId);
+//
+//    @Tailable // 커서를 안닫고 계속 유지한다.
+//    @Query("{roomNum:?0}")
+//    Flux<Chat> mFindByRoomNum(Long roomId);
+//
+//    @Tailable
+//    Flux<Chat> findAllByDeleteIsFalse();
 
-    @Tailable // 커서를 안닫고 계속 유지한다.
-    @Query("{roomNum:?0}")
-    Flux<Chat> mFindByRoomNum(Long roomId);
+    Flux<Chat> findAllByRoomId(String roomId);
 }

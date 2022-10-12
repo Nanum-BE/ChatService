@@ -50,7 +50,8 @@ public class AppUtils {
                 .users(users)
                 .title(alertRequest.getTitle())
                 .url(alertRequest.getUrl())
-                .createAt(LocalDateTime.now())
+                .createAt(null)
+                .deleteAt(false)
                 .build();
     }
 
