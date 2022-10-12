@@ -1,7 +1,14 @@
 #spring.rsocket.server.port=7000
 #spring.main.lazy-initialization=true
+#
+#spring:
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379
 
 spring:
   redis:
-    host: 127.0.0.1
-    port: 6379
+    host: redis-server.redis.cache.windows.net
+    password: r26QMFUITuu9deG9dXntZBcNSws4Rq16hAzCaM4EF6o=
+    port: 6380
+    ssl: true
