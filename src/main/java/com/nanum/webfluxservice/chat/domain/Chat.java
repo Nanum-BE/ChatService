@@ -28,7 +28,9 @@ public class Chat {
 
     private Long userId;
 
+    private String username;
 
+    private String type;
     private String msg;
 
 

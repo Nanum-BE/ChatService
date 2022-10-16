@@ -1,12 +1,16 @@
 package com.nanum.webfluxservice.chat.infrastructure;
 
 import com.nanum.webfluxservice.chat.domain.Chat;
+import com.nanum.webfluxservice.chat.domain.Room;
 import org.springframework.data.mongodb.repository.Meta;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.mongodb.repository.Tailable;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+
+import java.time.LocalDateTime;
+
 @Repository
 public interface ChatRepository extends ReactiveMongoRepository<Chat, String>,ChatRepositoryCustom {
 
@@ -20,6 +24,6 @@ public interface ChatRepository extends ReactiveMongoRepository<Chat, String>,Ch
 //
 //    @Tailable
 //    Flux<Chat> findAllByDeleteIsFalse();
-
+    Flux<Chat> findAllByRoomIdAndCreateAtAfter(String roomId, LocalDateTime date);
     Flux<Chat> findAllByRoomId(String roomId);
 }

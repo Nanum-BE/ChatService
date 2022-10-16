@@ -12,6 +12,7 @@ import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,15 +35,20 @@ public class AppUtils {
         Gson gson = new Gson();
         Map<String, Object> map = new HashMap();
         Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
-
         Long sender = Long.valueOf(fromJson.get("sender").toString());
+        String type = fromJson.get("type").toString();
+     String username = fromJson.get("username").toString();
+
         return Chat.builder()
-                .msg(msg)
-                .userId(sender)
-                .delete(false)
-                .createAt(null)
-                .roomId(roomId)
-                .build();
+                    .msg(msg)
+                    .userId(sender)
+                    .delete(false)
+                    .type(type)
+                    .username(username)
+                    .createAt(null)
+                    .roomId(roomId)
+                    .build();
+
     }
     public static ChatDto entityToDto(Chat chat){
         return ChatDto.builder()
@@ -136,6 +142,7 @@ public class AppUtils {
                     .userId(userId)
                     .readCount(0)
                     .connect(false)
+                    .createAt(LocalDateTime.now())
                     .build());
         }
         RoomInfo roomInfo = RoomInfo.builder()
