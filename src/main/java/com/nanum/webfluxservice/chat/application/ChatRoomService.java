@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.websocket.WebsocketInbound;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,60 +38,35 @@ public class ChatRoomService implements WebSocketHandler {
 
 
 
-
     @Override
     public Mono<Void> handle(WebSocketSession session) {
 
-        log.info("init Handle");
+
+            log.info("init Handle");
         HashMap<String, String> uriInfo = getChatRoomName(session);
         String roomId = uriInfo.get("room");
         Long userId = Long.valueOf(uriInfo.get("userId"));
-
+//        String username = uriInfo.get("username");
         startChatRoom(roomId, userId);
 
         log.info("session.getId()"+session.getId());
         log.info("room: "+ roomId);
 
         RTopicReactive topic = this.client.getTopic(roomId, StringCodec.INSTANCE);
-        RListReactive<String> list = this.client.getList("history:" + roomId, StringCodec.INSTANCE);
-        Flux<Chat> chatsByRoom = chatService.getChatsByRoom(roomId);
-        list.isExists().map(e->{
-            if(!e){
-                chatsByRoom.flatMap(chat -> list.add(chat.getMsg()));
-            }
-            return e;
-        });
+
         // subscribe
         session.receive()
                 .map(WebSocketMessage::getPayloadAsText)
-                .flatMap(msg-> chatService.add(msg,roomId).then(list.add(msg))
+                .flatMap(msg-> chatService.add(msg,roomId)
                         .then(roomService.updateCountByRoomIdAndMsgAndSendSSE(roomId,msg))
-//                        .then(roomService.updateCountByRoomIdAndMsg(roomId,msg))
                         .then(topic.publish(msg)))
                 .doOnError(er->log.error(String.valueOf(er)))
                 .doFinally(signalType -> log.info("Subscriber finally "+signalType))
                 .subscribe();
 
-/*
-        원본
-        // subscribe
-        session.receive()
-                .map(WebSocketMessage::getPayloadAsText)
-                .flatMap(msg->list.add(msg).then(topic.publish(msg)))
-                .doOnError(er->log.error(String.valueOf(er)))
-                .doFinally(signalType -> log.info("Subscriber finally "+signalType))
-                .subscribe();
-
- */
-//        Flux<WebSocketMessage> mongodbFlux = chatsByRoom.
-//                map(chat -> session.textMessage(chat.getMsg()))
-//                .doOnError(er -> log.error(String.valueOf(er)))
-//                .doFinally(signalType -> log.info("Publisher finally " + signalType));
-        session.close()
-                .doFinally(signalType -> log.info("close finally "+signalType));
-        // publisher
+       // publisher
         Flux<WebSocketMessage> flux = topic.getMessages(String.class)
-                .startWith(list.iterator())
+                .startWith(chatService.getChatsByRoomIdAndUserId(roomId,userId).map(chat -> chat.getMsg()))
                 .map(session::textMessage)
                 .doOnError(er->log.error(String.valueOf(er)))
                 .doFinally(signalType -> {log.info("Publisher finally "+signalType);
@@ -99,20 +75,16 @@ public class ChatRoomService implements WebSocketHandler {
                     }
                 });
 
-//        // publisher
-//        Flux<WebSocketMessage> flux = topic.getMessages(String.class)
-//
-//                .startWith(list.iterator())
-//                .map(session::textMessage)
-//                .doOnError(er->log.error(String.valueOf(er)))
-//                .doFinally(signalType -> log.info("Publisher finally "+signalType));
+        // close
+        session.close()
+                .doFinally(signalType -> log.info("close finally "+signalType));
 
-//        session.send();
         return session.send(flux);
     }
 
     private Mono<Void> startChatRoom(String roomId, Long userId) {
          roomService.updatedConnectRoomByIdByUserId(roomId,userId);
+//        roomService.updatedConnectRoomByIdByUserIdV2(roomId,userId, username);
          return null;
     }
 
@@ -136,6 +108,16 @@ public class ChatRoomService implements WebSocketHandler {
         HashMap<String, String> result = new HashMap<>();
         result.put("room",roomId);
         result.put("userId",userId);
+//
+//        String username = UriComponentsBuilder.fromUri(uri)
+//                .build()
+//                .getQueryParams()
+//                .toSingleValueMap()
+//                .getOrDefault("username","default");
+//
+//        result.put("username",username);
+
         return result;
     }
 }
+
