@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class RoomServiceImpl implements RoomService{
 
     private final RoomRepository roomRepository;
     private final ChatRepository chatRepository;
-
+    private final ChatService chatService;
     private final AlertService alertService;
     @Override
     public Mono<RoomDto> save(Mono<RoomDto> roomDtoMono) {
@@ -64,8 +65,12 @@ public class RoomServiceImpl implements RoomService{
                     for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
                         if(room.getRoomInfo().getUsers().get(i).getUserId() == userId){
                             UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
+
                             changeUserInfo.setConnect(true);
                             changeUserInfo.setReadCount(0);
+
+
+
                             room.getRoomInfo().getUsers().set(i,changeUserInfo);
                             break;
                         }
@@ -126,6 +131,37 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     public Mono<RoomDto> updateRoomByUserId(String id, Long userId) {
+      return roomRepository.findById(id)
+                .map(AppUtils::entityToDto)
+                .map(roomDto -> {
+                    boolean valid = true;
+                    for (UserInfo userInfo:roomDto.getRoomInfo().getUsers()) {
+                        if(userId==userInfo.getUserId()){
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if(valid){
+                        UserInfo userInfo = UserInfo.builder().userId(userId)
+                                .readCount(0)
+                                .connect(false)
+                                .createAt(LocalDateTime.now())
+                                .build();
+                        roomDto.getRoomInfo().getUsers().add(userInfo);
+                    }else{
+                        log.error(userId+"'s already existed");
+                    }
+
+
+                    return roomDto;
+                }).map(AppUtils::dtoToEntity)
+                .flatMap(roomRepository::save)
+                .map(AppUtils::entityToDto);
+
+    }
+
+    @Override
+    public Mono<RoomDto> updateRoomByUserIdV2(String id, Long userId, String username) {
         return roomRepository.findById(id)
                 .map(AppUtils::entityToDto)
                 .map(roomDto -> {
@@ -140,6 +176,7 @@ public class RoomServiceImpl implements RoomService{
                         UserInfo userInfo = UserInfo.builder().userId(userId)
                                 .readCount(0)
                                 .connect(false)
+                                .createAt(LocalDateTime.now())
                                 .build();
                         roomDto.getRoomInfo().getUsers().add(userInfo);
                     }else{
@@ -149,13 +186,38 @@ public class RoomServiceImpl implements RoomService{
                 }).map(AppUtils::dtoToEntity)
                 .flatMap(roomRepository::save)
                 .map(AppUtils::entityToDto);
-
     }
+
     public Flux<Room> findAllBySSE(Long userId) {
         // Simulate the data streaming every 2 seconds.
 
         return null;
     }
+
+    @Override
+    public Mono<Void> updatedConnectRoomByIdByUserIdV2(String id, Long userId, String username) {
+        log.info("userInfo--------------"+userId+"::::"+id);
+        roomRepository.findById(id)
+                .map(room -> {
+                    log.info("userInfo--------------"+room.getRoomName()+"::::"+id);
+                    for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
+                        if(room.getRoomInfo().getUsers().get(i).getUserId() == userId){
+                            UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
+                            changeUserInfo.setConnect(true);
+                            changeUserInfo.setReadCount(0);
+//                            if(!changeUserInfo.isFirstIn()){
+//                                chatService.inRoomByRoomIdAndUserIdAndUserName(id,userId,username);
+//                                changeUserInfo.setFirstIn(true);
+//                            }
+                            room.getRoomInfo().getUsers().set(i,changeUserInfo);
+                            break;
+                        }
+                    }
+                    return room;
+                }).flatMap(roomRepository::save).then().subscribe();
+        return null;
+    }
+
     @Override
     public Mono<Void> updateCountByRoomIdAndMsg(String id,String msg) {
         JsonObject jsonObject = (JsonObject) JsonParser.parseString(msg);
@@ -189,8 +251,9 @@ public class RoomServiceImpl implements RoomService{
         Map<String, Object> map = new HashMap();
         Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
         Long sender = Long.valueOf(fromJson.get("sender").toString());
-        String senderName = fromJson.get("senderName").toString();
+        String senderName = fromJson.get("username").toString();
         String message = fromJson.get("message").toString();
+
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------" + room.getRoomName() + "::::" + id);

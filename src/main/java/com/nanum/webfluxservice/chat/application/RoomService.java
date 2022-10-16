@@ -26,9 +26,14 @@ public interface RoomService {
 
     Mono<RoomDto> updateRoomByUserId(String id, Long userId);
 
+
+    Mono<RoomDto> updateRoomByUserIdV2(String id, Long userId,String username);
+
     Mono<Void> updateCountByRoomIdAndMsg(String id,String msg);
 
     Mono<Void> updateCountByRoomIdAndMsgAndSendSSE(String id,String msg);
 
     public Flux<Room> findAllBySSE(Long userId);
+
+    Mono<Void> updatedConnectRoomByIdByUserIdV2(String roomId, Long userId, String username);
 }
