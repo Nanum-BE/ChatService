@@ -18,6 +18,7 @@ public class RoomDto {
 //    private List<Long> userIds;
     private String roomName;
     private RoomInfo roomInfo;
+    private String houseImg;
     private Long houseId;
     private LocalDateTime createAt;
 

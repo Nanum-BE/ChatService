@@ -69,6 +69,7 @@ public class AppUtils {
                 .createAt(room.getCreateAt())
                 .deleteAt(room.getDeleteAt())
                 .houseId(room.getHouseId())
+                .houseImg(room.getHouseImg())
                 .id(room.getId())
                 .build();
     }
@@ -80,6 +81,7 @@ public class AppUtils {
                 .createAt(roomDto.getCreateAt())
                 .deleteAt(roomDto.getDeleteAt())
                 .houseId(roomDto.getHouseId())
+                .houseImg(roomDto.getHouseImg())
                 .id(roomDto.getId())
                 .build();
     }
@@ -154,6 +156,7 @@ public class AppUtils {
         return RoomDto.builder()
                 .houseId(roomRequest.getHouseId())
                 .roomInfo(roomInfo)
+                .houseImg(roomRequest.getHouseImg())
                 .roomName(roomRequest.getRoomName())
                 .build();
     }
