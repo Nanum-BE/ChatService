@@ -1,5 +1,6 @@
 package com.nanum.webfluxservice.chat.presentaion;
 
+import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.chat.application.ChatService;
 import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
@@ -20,6 +21,7 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,5 +64,4 @@ public ResponseEntity<Flux<ChatDto>> retrieveChatsByUserId(@PathVariable("roomId
 
         return chatService.chatSave(chatDto);
     }
-
 }

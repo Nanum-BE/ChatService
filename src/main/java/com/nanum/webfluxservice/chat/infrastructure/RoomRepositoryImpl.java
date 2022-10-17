@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class RoomRepositoryImpl implements RoomRepositoryCustom {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
@@ -27,6 +29,22 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         query.fields().include("updateAt");
         query.fields().include("deleteAt");
         return reactiveMongoTemplate.find(query,Room.class);
+    }
+
+
+
+    @Override
+    public Mono<Boolean> existsByRoomInfoUsersUserIdAndHouseId(List<Long> userIds){
+        Query query = new Query();
+        query.addCriteria(
+                Criteria.where("roomInfo").elemMatch(
+                                Criteria
+                                        .where("users").elemMatch(
+                                        Criteria.where("userId").in(userIds)
+                                        )
+                                ) .and("houseId").is(0L)
+        );
+        return reactiveMongoTemplate.exists(query,Room.class);
     }
 
     public Mono<Long> countAllReadByUsers(Long userId){

@@ -73,6 +73,7 @@ public class AlertController {
     @Operation(summary = "알림 삭제 API", description = "해당 알림을 삭제합니다.")
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteAlert(@PathVariable String id){
+
         return alertService.deleteAlert(id)
                 .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -99,7 +100,6 @@ public class AlertController {
         return alertService.getAlertsByUserByCount(userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
-
     }
     @Operation(summary = "유저별 알림 삭제 API", description = "유저별 원하지 않는 알림을 모두 식제합니다.")
     @DeleteMapping("/users/{userId}")

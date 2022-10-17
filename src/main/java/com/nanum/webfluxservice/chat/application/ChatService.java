@@ -6,6 +6,8 @@ import com.nanum.webfluxservice.chat.dto.ChatDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface ChatService {
 
 //    Flux<ChatDto> findBySenderAndReceiver(Long senderId, Long receiverId);
