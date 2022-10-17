@@ -23,4 +23,6 @@ public class RoomRequest {
     @Schema(description = "채팅방을 생성하기 위한 해당 하우스의 ID값을 입력하세요.",defaultValue = "1")
     private Long houseId;
 
+    @Schema(description = "채팅방을 생성하기 위한 해당 하우스의 Image Uri을 입력하세요.",defaultValue = "/images/default.png")
+    private String houseImg;
 }
