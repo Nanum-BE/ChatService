@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface RoomRepository extends ReactiveMongoRepository<Room, String>, RoomRepositoryCustom {
@@ -17,4 +18,7 @@ public interface RoomRepository extends ReactiveMongoRepository<Room, String>, R
 
 
 
+
+
+    Mono<Boolean> existsByRoomNameAndHouseId(String username, Long houseId);
 }

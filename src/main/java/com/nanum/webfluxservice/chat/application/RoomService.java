@@ -5,6 +5,8 @@ import com.nanum.webfluxservice.chat.dto.RoomDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface RoomService {
 
     /*
@@ -18,6 +20,8 @@ public interface RoomService {
 
     Mono<Void> updatedConnectRoomByIdByUserId(String id, Long userId);
     Mono<Void> cancelConnectRoomByIdByUserId(String id, Long userId);
+
+
     Flux<RoomDto> getRooms();
 
     Flux<RoomDto> getRoomsByUserId(Long userId);
@@ -36,4 +40,7 @@ public interface RoomService {
     public Flux<Room> findAllBySSE(Long userId);
 
     Mono<Void> updatedConnectRoomByIdByUserIdV2(String roomId, Long userId, String username);
+
+
+    Mono<Boolean> validChatRoom(List<Long> params);
 }

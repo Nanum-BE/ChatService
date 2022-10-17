@@ -5,4 +5,4 @@ spring:
   application:
     name: web-flux-service
   profiles:
-    include: mongodb, swagger, eureka, rsocket
+    include: mongodb, swagger, rsocket, eureka

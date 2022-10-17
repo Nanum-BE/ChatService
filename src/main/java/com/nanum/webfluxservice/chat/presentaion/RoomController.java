@@ -28,6 +28,7 @@ import reactor.core.scheduler.Schedulers;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.List;
 
 
 @RestController
@@ -95,5 +96,15 @@ public class RoomController {
 //                        .event("ev")
 //                        .data("SSE - " + LocalTime.now().toString())
 //                        .build());
+    }
+    @Operation(summary = "기존에 있는 방인지 확인 API", description = "기존에 있는 방인지 확인합니다.")
+    @CrossOrigin
+    @GetMapping(value = "/users", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Mono<ResponseEntity<Boolean>> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
+                                                       List<Long> params){
+
+        return roomService.validChatRoom(params)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
