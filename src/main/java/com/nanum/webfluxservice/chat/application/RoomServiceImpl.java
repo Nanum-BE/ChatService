@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.nanum.webfluxservice.alert.application.AlertService;
-import com.nanum.webfluxservice.alert.domain.Alert;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.alert.vo.AlertRequest;
 import com.nanum.webfluxservice.chat.domain.Room;
@@ -15,12 +14,10 @@ import com.nanum.webfluxservice.chat.infrastructure.RoomRepository;
 import com.nanum.webfluxservice.chat.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.codec.ServerSentEventHttpMessageReader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,6 +96,17 @@ public class RoomServiceImpl implements RoomService{
         return null;
     }
 
+
+
+    @Override
+    public Mono<Boolean> validChatRoom(List<Long> params) {
+        if(params.size()==2){
+            String username = String.format("%d, %d",params.get(0),params.get(1));
+            return roomRepository.existsByRoomNameAndHouseId(username,0L);
+        }
+        return Mono.just(false);
+
+    }
     @Override
     public Flux<RoomDto> getRooms() {
         return roomRepository.findAll().map(AppUtils::entityToDto);

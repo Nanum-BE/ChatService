@@ -27,7 +27,7 @@ public class Room {
 
     private Long houseId;
     private String roomName;
-
+    private String houseImg;
 //    @DocumentReference(lazy = false)
 //    private RoomInfo roomInfoId;
     //    @DocumentReference(lazy = true)
