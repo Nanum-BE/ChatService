@@ -49,10 +49,11 @@ public class RoomController {
     private final SSeServiceImpl sse;
     @Operation(summary = "채팅방 생성 API", description = "채팅을 해당 관련된 id를 추가하여 채팅을 만듭니다.")
     @PostMapping
-    public Mono<ResponseEntity<RoomDto>> saveRoom(@Valid @RequestBody Mono<RoomRequest> roomRequestMono){
-        return roomService.save(roomRequestMono.map(AppUtils::voToDto))
-                .then(Mono.just(new ResponseEntity<RoomDto>(HttpStatus.CREATED)))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Mono<RoomDto>> saveRoom(@Valid @RequestBody Mono<RoomRequest> roomRequestMono){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(roomService.save(roomRequestMono.map(AppUtils::voToDto)));
+//                .then(Mono.just(new ResponseEntity<RoomDto>(HttpStatus.OK)))
+//                .(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
     }
 
