@@ -81,11 +81,9 @@ public class AlertController {
     @Operation(summary = "알림 기능 받기 API", description = "알림기능을 이용하기 위해 유저와 연결합니다.")
     @CrossOrigin
     @GetMapping(value = "/users", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Mono<ResponseEntity<AlertDto>> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
+    public Flux<AlertDto> subscribeUser(@RequestParam(value="param", required=false, defaultValue="")
                                             List<Long> params){
-        return alertService.connect(params).subscribeOn(Schedulers.boundedElastic())
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return alertService.connectFlux(params).subscribeOn(Schedulers.boundedElastic());
     }
     @Operation(summary = "유저별 알림 전체 조회 API", description = "해당 유저가 볼수 있는 알림을 모두 출력합니다.")
     @GetMapping("/users/{id}")
