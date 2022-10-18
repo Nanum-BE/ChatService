@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.mongodb.repository.Tailable;
 
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -30,8 +31,10 @@ public interface AlertRepository extends ReactiveMongoRepository<Alert, String>,
 //    Flux<Alert> findByUserIdsInAndDeletedByUserIdsNotIn(List<Long> userIds,List<Long> deletedUsers);
 //    Mono<Long> countByUserIdsInAndDeletedByUserIdsNotInAndReadByUserIdsNotIn(List<Long> userIds
 //            ,List<Long> deletedUsers , List<Long> readUsers);
+//    @Tailable
+//    Mono<Alert> findByUsersContainsAndCreateAtAfter(List<User> user, LocalDateTime localDateTime);
     @Tailable
-    Mono<Alert> findByUsersContainsAndCreateAtAfter(List<User> user, LocalDateTime localDateTime);
+    Flux<Alert> findByUsersContainsAndCreateAtAfter(List<User> user, LocalDateTime localDateTime);
 
 
 
