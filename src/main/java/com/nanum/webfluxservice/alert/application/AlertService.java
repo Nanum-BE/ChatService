@@ -37,4 +37,6 @@ public interface AlertService {
     Flux<AlertDto> subscribe(Long id, String lastEventId);
 
     Mono<AlertDto> connect(List<Long> userId);
+
+    Flux<AlertDto> connectFlux(List<Long> params);
 }
