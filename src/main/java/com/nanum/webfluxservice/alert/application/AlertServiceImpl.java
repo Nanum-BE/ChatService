@@ -115,6 +115,15 @@ public class AlertServiceImpl implements AlertService{
         for (Long user: userId) {
             userEntity.add(User.builder().userId(user).build());
         }
+        return null;
+    }
+
+    @Override
+    public Flux<AlertDto> connectFlux(List<Long> userId) {
+        List<User> userEntity = new ArrayList<>();
+        for (Long user: userId) {
+            userEntity.add(User.builder().userId(user).build());
+        }
         return alertRepository.findByUsersContainsAndCreateAtAfter(userEntity,LocalDateTime.now())
                 .map(AppUtils::entityToDto);
     }
