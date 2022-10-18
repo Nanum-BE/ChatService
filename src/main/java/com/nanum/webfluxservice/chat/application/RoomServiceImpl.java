@@ -285,10 +285,11 @@ public class RoomServiceImpl implements RoomService{
                         }
                     }
                     AlertRequest alertRequest = AlertRequest.builder()
-                            .content(room.toString())
-                            .title("채팅")
+                            .content(String.format("{\"id\":\"%s\",\"lastMessage\":\"%s\",\"date\":\"%s\"}"
+                                    ,room.getId(),room.getRoomInfo().getLastMessage(),room.getUpdateAt()))
+                            .title("CHAT")
                             .userIds(userIds)
-                            .url("http://~~")
+                            .url("http://localhost:3000/chat")
                             .build();
                     AlertDto alertDto = com.nanum.webfluxservice.alert.utils.AppUtils.voToDto(alertRequest);
                     return alertDto;
