@@ -12,7 +12,7 @@ public class ChatDto {
     private String id;
     private String msg;
 
-    private Long userId;
+    private String userId;
 
     private String roomId;
     private LocalDateTime createAt;
