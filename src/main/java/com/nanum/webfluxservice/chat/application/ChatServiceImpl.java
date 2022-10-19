@@ -73,7 +73,7 @@ public class ChatServiceImpl implements ChatService{
     }
 
     @Override
-    public Mono<Void> inRoomByRoomIdAndUserIdAndUserName(String id,Long userId, String username) {
+    public Mono<Void> inRoomByRoomIdAndUserIdAndUserName(String id,String userId, String username) {
        String msg =  String.format("{\"sender\":\"%d\",\"message\":\"%s님이 들어왔습니다.\",\"senderName\":\"%s\",\"type\":\"IN\",\"createAt\":\"%s\"}"
                ,userId,username,username, LocalDateTime.now());
         Chat chat = Chat.builder()
@@ -92,7 +92,7 @@ public class ChatServiceImpl implements ChatService{
     }
 
     @Override
-    public Mono<Void> outRoomByUserIdAndRoomId(String id,Long userId, String username) {
+    public Mono<Void> outRoomByUserIdAndRoomId(String id,String userId, String username) {
         String msg =  String.format("{\"sender\":\"%d\",\"message\":\"%s님이 나갔습니다.\",\"senderName\":\"%s\",\"type\":\"OUT\",\"createAt\":\"%s\"}"
                 ,userId,username,username, LocalDateTime.now());
         Chat chat = Chat.builder()
