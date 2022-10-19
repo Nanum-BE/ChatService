@@ -43,4 +43,6 @@ public interface RoomService {
 
 
     Mono<Boolean> validChatRoom(List<Long> params);
+
+    Mono<RoomDto> getRoom(String roomId);
 }

@@ -20,8 +20,8 @@ public interface ChatService {
 
     Flux<ChatDto> getChatsByRoomIdAndUserId(String roomId, Long userId);
 
-    Mono<Void> inRoomByRoomIdAndUserIdAndUserName(String id,Long userId, String username);
+    Mono<Void> inRoomByRoomIdAndUserIdAndUserName(String id,String userId, String username);
 
-    Mono<Void> outRoomByUserIdAndRoomId(String id,Long userId, String username);
+    Mono<Void> outRoomByUserIdAndRoomId(String id,String userId, String username);
 //    Flux<ChatDto> connectedRoom(Long roomId);
 }

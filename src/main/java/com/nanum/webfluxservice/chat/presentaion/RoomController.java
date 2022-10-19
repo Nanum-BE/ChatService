@@ -63,6 +63,12 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.getRooms());
     }
 
+    @Operation(summary = "채팅방 상세 조회 API", description = "전체조회.")
+    @GetMapping("/{roomId}")
+    public ResponseEntity<Mono<RoomDto>> retrieveRoom(@PathVariable("roomId") String roomId){
+        return ResponseEntity.status(HttpStatus.OK).body(roomService.getRoom(roomId));
+    }
+
     @Operation(summary = "유저별 채팅방 조회 API", description = "유저별 채팅방 전체조회.")
     @GetMapping("/users/{userId}")
     public ResponseEntity<Flux<RoomDto>> retrieveRoomsByUserId(@PathVariable("userId") Long userId){
