@@ -1,5 +1,6 @@
 package com.nanum.webfluxservice.chat.presentaion;
 
+import com.nanum.config.BaseResponse;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.chat.application.RoomService;
 import com.nanum.webfluxservice.chat.domain.Room;
@@ -9,6 +10,7 @@ import com.nanum.webfluxservice.chat.utils.AppUtils;
 
 import com.nanum.webfluxservice.chat.utils.SSeServiceImpl;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
+import com.nanum.webfluxservice.chat.vo.RoomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +30,7 @@ import reactor.core.scheduler.Schedulers;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -75,6 +78,16 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.getRoomsByUserId(userId));
     }
 
+    @Operation(summary = "기존 채팅방 상세 조회 API", description = "기존 채팅방에 있을 경우 가져오고 아닐 경우 빈 값 조회")
+    @GetMapping("/houses/{houseId}")
+    public Mono<ResponseEntity<RoomResponse>> retrieveRoomByUserIdAndHouseId(@PathVariable("houseId") Long houseId,
+                                                                             @RequestParam(value="users", required=false, defaultValue="")
+                                                                            List<Long> params){
+        return roomService.getRoomByUserIdAndHouseId(params, houseId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @Operation(summary = "유저별 채팅방 나가기 API", description = "해당 유저의 채팅방 나가기 조회.")
     @DeleteMapping("/{id}/users/{userId}")
     public Mono<ResponseEntity<RoomDto>> deleteRoomsByUserId(@PathVariable("id") String id,
@@ -113,5 +126,11 @@ public class RoomController {
         return roomService.validChatRoom(params)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+    @GetMapping("/users/{userId}/count")
+    public Mono<ResponseEntity<HashMap<String, Integer>>> countAllRoomsByReadMark(@PathVariable("userId") Long userId){
+
+        return roomService.countAllRoomsByReadMark(userId)
+                .map(ResponseEntity::ok);
     }
 }

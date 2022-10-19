@@ -13,12 +13,14 @@ import java.util.List;
 @Repository
 public interface RoomRepository extends ReactiveMongoRepository<Room, String>, RoomRepositoryCustom {
 
-    Flux<Room> findAllByRoomInfoUsersUserIdOrderByUpdateAtDesc(Long userId);
+    Flux<Room> findAllByRoomInfoUsersUserId(Long userId);
 //    Flux<Room> findAllByUserIdsInAn(Long userId);
+    Flux<Room> findAllByRoomInfoUsersUserIdOrderByRoomInfoUpdateAtDesc(Long userId);
 
-
-
+    Flux<Room> findAllByRoomInfoUsersUserIdAndHouseId(Long userId,Long houseId);
 
 
     Mono<Boolean> existsByRoomNameAndHouseId(String username, Long houseId);
+
+
 }

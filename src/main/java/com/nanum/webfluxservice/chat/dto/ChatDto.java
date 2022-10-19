@@ -14,6 +14,7 @@ public class ChatDto {
 
     private String userId;
 
+    private String updateAt;
     private String roomId;
     private LocalDateTime createAt;
     private boolean delete;
