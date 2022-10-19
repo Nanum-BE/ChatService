@@ -22,6 +22,8 @@ public class RoomInfo {
 
     private Long lastSentUserId;
     private String lastSentUserName;
+
+    private String updateAt;
     private List<UserInfo> users;
 
 //    @DocumentReference(lazy = false, lookup = "{ 'primaryRoomInfo': ?#{#self._id}")

@@ -1,5 +1,6 @@
 package com.nanum.webfluxservice.chat.presentaion;
 
+import com.nanum.config.BaseResponse;
 import com.nanum.webfluxservice.alert.dto.AlertDto;
 import com.nanum.webfluxservice.chat.application.RoomService;
 import com.nanum.webfluxservice.chat.domain.Room;
@@ -29,6 +30,7 @@ import reactor.core.scheduler.Schedulers;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -124,5 +126,11 @@ public class RoomController {
         return roomService.validChatRoom(params)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+    @GetMapping("/users/{userId}/count")
+    public Mono<ResponseEntity<HashMap<String, Integer>>> countAllRoomsByReadMark(@PathVariable("userId") Long userId){
+
+        return roomService.countAllRoomsByReadMark(userId)
+                .map(ResponseEntity::ok);
     }
 }

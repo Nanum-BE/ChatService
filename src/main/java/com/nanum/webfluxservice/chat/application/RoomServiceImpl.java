@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,6 +136,25 @@ public class RoomServiceImpl implements RoomService{
                 });
     }
 
+    @Override
+    public Mono<HashMap<String, Integer>> countAllRoomsByReadMark(Long userId) {
+        AtomicInteger count = new AtomicInteger(0);
+        return roomRepository.findAllByRoomInfoUsersUserId(userId)
+                .collectList()
+                .map(rooms -> {
+                    for (Room room: rooms) {
+                        for (UserInfo userInfo: room.getRoomInfo().getUsers()) {
+                            if(userId == userInfo.getUserId()){
+                                count.addAndGet(userInfo.getReadCount());
+                            }
+                        }
+                    }
+                    HashMap<String, Integer> result = new HashMap<>();
+                    result.put("count",count.get());
+                    return result;
+                });
+    }
+
 
     @Override
     public Flux<RoomDto> getRooms() {
@@ -143,7 +163,7 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     public Flux<RoomDto> getRoomsByUserId(Long userId) {
-        return roomRepository.findAllByRoomInfoUsersUserIdOrderByUpdateAtDesc(userId)
+        return roomRepository.findAllByRoomInfoUsersUserIdOrderByRoomInfoUpdateAtDesc(userId)
                 .map(AppUtils::entityToDto);
     }
 
@@ -269,12 +289,14 @@ public class RoomServiceImpl implements RoomService{
         Long sender = Long.valueOf(fromJson.get("sender").toString());
         String senderName = fromJson.get("senderName").toString();
         String message = fromJson.get("message").toString();
+        String updateAt = fromJson.get("createAt").toString();
        return roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------"+room.getRoomName()+"::::"+id);
                     room.getRoomInfo().setLastMessage(message);
                     room.getRoomInfo().setLastSentUserId(sender);
                     room.getRoomInfo().setLastSentUserName(senderName);
+                    room.getRoomInfo().setUpdateAt(updateAt);
                     for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
                         if(!room.getRoomInfo().getUsers().get(i).isConnect()){
                             UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
@@ -295,6 +317,7 @@ public class RoomServiceImpl implements RoomService{
         Long sender = Long.valueOf(fromJson.get("sender").toString());
         String senderName = fromJson.get("username").toString();
         String message = fromJson.get("message").toString();
+        String updateAt = fromJson.get("createAt").toString();
 
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
@@ -302,6 +325,7 @@ public class RoomServiceImpl implements RoomService{
                     room.getRoomInfo().setLastMessage(message);
                     room.getRoomInfo().setLastSentUserId(sender);
                     room.getRoomInfo().setLastSentUserName(senderName);
+                    room.getRoomInfo().setUpdateAt(updateAt);
                     for (int i = 0; i < room.getRoomInfo().getUsers().size(); i++) {
                         if (!room.getRoomInfo().getUsers().get(i).isConnect()) {
                             UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
