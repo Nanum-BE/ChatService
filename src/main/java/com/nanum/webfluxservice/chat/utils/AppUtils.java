@@ -35,7 +35,7 @@ public class AppUtils {
         Gson gson = new Gson();
         Map<String, Object> map = new HashMap();
         Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
-        Long sender = Long.valueOf(fromJson.get("sender").toString());
+        String sender = fromJson.get("sender").toString();
         String type = fromJson.get("type").toString();
      String username = fromJson.get("username").toString();
 

@@ -26,7 +26,7 @@ public class Chat {
 
     private String roomId;
 
-    private Long userId;
+    private String userId;
 
     private String username;
 

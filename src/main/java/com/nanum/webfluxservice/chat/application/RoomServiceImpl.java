@@ -107,6 +107,13 @@ public class RoomServiceImpl implements RoomService{
         return Mono.just(false);
 
     }
+
+    @Override
+    public Mono<RoomDto> getRoom(String roomId) {
+        return roomRepository.findById(roomId)
+                .map(AppUtils::entityToDto);
+    }
+
     @Override
     public Flux<RoomDto> getRooms() {
         return roomRepository.findAll().map(AppUtils::entityToDto);
