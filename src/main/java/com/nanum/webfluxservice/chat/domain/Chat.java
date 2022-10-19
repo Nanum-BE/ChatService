@@ -33,7 +33,7 @@ public class Chat {
     private String type;
     private String msg;
 
-
+    private String updateAt;
     @CreatedDate
     private LocalDateTime createAt;
 

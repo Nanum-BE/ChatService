@@ -29,6 +29,7 @@ public class AppUtils {
                 .delete(chatDto.isDelete())
                 .createAt(chatDto.getCreateAt())
                 .roomId(chatDto.getRoomId())
+                .updateAt(chatDto.getUpdateAt())
                 .build();
     }
     public static Chat msgToEntity(String msg, String roomId){
@@ -39,13 +40,14 @@ public class AppUtils {
         String sender = fromJson.get("sender").toString();
         String type = fromJson.get("type").toString();
      String username = fromJson.get("username").toString();
-
+        String updateAt = fromJson.get("createAt").toString();
         return Chat.builder()
                     .msg(msg)
                     .userId(sender)
                     .delete(false)
                     .type(type)
                     .username(username)
+                    .updateAt(updateAt)
                     .createAt(null)
                     .roomId(roomId)
                     .build();
@@ -59,6 +61,7 @@ public class AppUtils {
                 .createAt(chat.getCreateAt())
                 .delete(chat.isDelete())
                 .roomId(chat.getRoomId())
+                .updateAt(chat.getUpdateAt())
                 .build();
     }
     public static RoomDto entityToDto(Room room){
