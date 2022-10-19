@@ -2,6 +2,7 @@ package com.nanum.webfluxservice.chat.application;
 
 import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
+import com.nanum.webfluxservice.chat.vo.RoomResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,4 +46,6 @@ public interface RoomService {
     Mono<Boolean> validChatRoom(List<Long> params);
 
     Mono<RoomDto> getRoom(String roomId);
+
+    Mono<RoomResponse> getRoomByUserIdAndHouseId(List<Long> params, Long houseId);
 }

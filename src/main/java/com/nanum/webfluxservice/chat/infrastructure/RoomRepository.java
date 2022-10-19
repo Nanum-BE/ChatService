@@ -17,7 +17,7 @@ public interface RoomRepository extends ReactiveMongoRepository<Room, String>, R
 //    Flux<Room> findAllByUserIdsInAn(Long userId);
 
 
-
+    Flux<Room> findAllByRoomInfoUsersUserIdAndHouseId(Long userId,Long houseId);
 
 
     Mono<Boolean> existsByRoomNameAndHouseId(String username, Long houseId);
