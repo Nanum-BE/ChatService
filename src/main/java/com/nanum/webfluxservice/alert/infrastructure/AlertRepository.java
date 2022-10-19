@@ -36,6 +36,6 @@ public interface AlertRepository extends ReactiveMongoRepository<Alert, String>,
     @Tailable
     Flux<Alert> findByUsersContainsAndCreateAtAfter(List<User> user, LocalDateTime localDateTime);
 
-
-
+    @Tailable
+    Mono<Alert> findByUsersContainsAndCreateAtIsAfter(List<User> user, LocalDateTime localDateTime);
 }

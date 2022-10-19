@@ -9,6 +9,7 @@ import com.nanum.webfluxservice.chat.utils.AppUtils;
 
 import com.nanum.webfluxservice.chat.utils.SSeServiceImpl;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
+import com.nanum.webfluxservice.chat.vo.RoomResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -73,6 +74,16 @@ public class RoomController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<Flux<RoomDto>> retrieveRoomsByUserId(@PathVariable("userId") Long userId){
         return ResponseEntity.status(HttpStatus.OK).body(roomService.getRoomsByUserId(userId));
+    }
+
+    @Operation(summary = "기존 채팅방 상세 조회 API", description = "기존 채팅방에 있을 경우 가져오고 아닐 경우 빈 값 조회")
+    @GetMapping("/houses/{houseId}")
+    public Mono<ResponseEntity<RoomResponse>> retrieveRoomByUserIdAndHouseId(@PathVariable("houseId") Long houseId,
+                                                                             @RequestParam(value="users", required=false, defaultValue="")
+                                                                            List<Long> params){
+        return roomService.getRoomByUserIdAndHouseId(params, houseId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @Operation(summary = "유저별 채팅방 나가기 API", description = "해당 유저의 채팅방 나가기 조회.")

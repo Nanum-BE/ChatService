@@ -12,6 +12,7 @@ import com.nanum.webfluxservice.chat.dto.RoomDto;
 import com.nanum.webfluxservice.chat.infrastructure.ChatRepository;
 import com.nanum.webfluxservice.chat.infrastructure.RoomRepository;
 import com.nanum.webfluxservice.chat.utils.AppUtils;
+import com.nanum.webfluxservice.chat.vo.RoomResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -115,6 +114,29 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
+    public Mono<RoomResponse> getRoomByUserIdAndHouseId(List<Long> params, Long houseId) {
+        return roomRepository.findAllByRoomInfoUsersUserIdAndHouseId(params.get(0),houseId)
+                .collectList()
+                .map(rooms -> {
+                    for (Room room:rooms) {
+                        List<Long> list = params.stream().distinct().collect(Collectors.toList());
+                        List<Long> users = new ArrayList<>();
+                        for (UserInfo userInfo:room.getRoomInfo().getUsers()) {
+                            users.add(userInfo.getUserId());
+                        }
+                        Collections.sort(users);
+                        Collections.sort(list);
+                        boolean result = Arrays.equals(users.toArray(),list.toArray());
+                        if(result){
+                            return AppUtils.entityToVo(room);
+                        }
+                    }
+                    return AppUtils.entityToVo(Room.builder().build());
+                });
+    }
+
+
+    @Override
     public Flux<RoomDto> getRooms() {
         return roomRepository.findAll().map(AppUtils::entityToDto);
     }
@@ -141,7 +163,12 @@ public class RoomServiceImpl implements RoomService{
                     return roomDto;
                 }).map(AppUtils::dtoToEntity)
                 .flatMap(roomRepository::save)
-                .map(AppUtils::entityToDto);
+                .map(room -> {
+                    if(room.getRoomInfo().getUsers()==null || room.getRoomInfo().getUsers().size() == 0){
+                        roomRepository.deleteById(id).subscribe();
+                    }
+                    return AppUtils.entityToDto(room);
+                });
     }
 
     @Override

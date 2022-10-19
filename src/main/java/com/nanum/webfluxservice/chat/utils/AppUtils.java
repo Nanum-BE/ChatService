@@ -11,6 +11,7 @@ import com.nanum.webfluxservice.chat.domain.UserInfo;
 import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
+import com.nanum.webfluxservice.chat.vo.RoomResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -63,6 +64,19 @@ public class AppUtils {
     public static RoomDto entityToDto(Room room){
 
         return RoomDto.builder()
+                .roomName(room.getRoomName())
+                .roomInfo(room.getRoomInfo())
+                .updateAt(room.getUpdateAt())
+                .createAt(room.getCreateAt())
+                .deleteAt(room.getDeleteAt())
+                .houseId(room.getHouseId())
+                .houseImg(room.getHouseImg())
+                .id(room.getId())
+                .build();
+    }
+    public static RoomResponse entityToVo(Room room){
+
+        return RoomResponse.builder()
                 .roomName(room.getRoomName())
                 .roomInfo(room.getRoomInfo())
                 .updateAt(room.getUpdateAt())
