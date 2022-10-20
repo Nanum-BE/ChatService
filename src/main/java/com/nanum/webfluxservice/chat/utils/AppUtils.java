@@ -2,6 +2,7 @@ package com.nanum.webfluxservice.chat.utils;
 
 import com.google.gson.Gson;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.nanum.webfluxservice.chat.domain.Chat;
@@ -12,13 +13,12 @@ import com.nanum.webfluxservice.chat.dto.ChatDto;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import com.nanum.webfluxservice.chat.vo.RoomRequest;
 import com.nanum.webfluxservice.chat.vo.RoomResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 public class AppUtils {
     public static Chat dtoToEntity(ChatDto chatDto){
         
@@ -30,9 +30,46 @@ public class AppUtils {
                 .createAt(chatDto.getCreateAt())
                 .roomId(chatDto.getRoomId())
                 .updateAt(chatDto.getUpdateAt())
+                .users(chatDto.getUsers())
                 .build();
     }
+    public static Chat msgToEntityV2(String msg, String roomId, List<String> users){
+
+
+        JsonObject jsonObject = (JsonObject) JsonParser.parseString(msg);
+        Gson gson = new Gson();
+        Map<String, Object> map = new HashMap();
+        Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
+        String sender = fromJson.get("sender").toString();
+        String type = fromJson.get("type").toString();
+        String username = fromJson.get("username").toString();
+        String updateAt = fromJson.get("createAt").toString();
+        // 메시지에 count 넣기
+//        String[] msgEncode = msg.split("\"}");
+//        String msgCreate = "";
+//        for (int i = 0; i<msgEncode.length - 1; i++ ) {
+//            log.info("msgCreate",msgEncode[i]);
+//            msgCreate += msgEncode[i];
+//        }
+//        msg =String.format("%s\",\"count\":\"%d\"}",msgEncode[0],count);
+
+//        String message =  String.format("{\"message\":%s,\"users\": %s }", msg, gson.toJson(users,List.class));
+        return Chat.builder()
+                .msg(msg)
+                .userId(sender)
+                .delete(false)
+                .type(type)
+                .username(username)
+                .updateAt(updateAt)
+                .createAt(null)
+                .users(users)
+                .roomId(roomId)
+                .build();
+
+    }
     public static Chat msgToEntity(String msg, String roomId){
+
+
         JsonObject jsonObject = (JsonObject) JsonParser.parseString(msg);
         Gson gson = new Gson();
         Map<String, Object> map = new HashMap();
@@ -62,6 +99,7 @@ public class AppUtils {
                 .delete(chat.isDelete())
                 .roomId(chat.getRoomId())
                 .updateAt(chat.getUpdateAt())
+                .users(chat.getUsers())
                 .build();
     }
     public static RoomDto entityToDto(Room room){

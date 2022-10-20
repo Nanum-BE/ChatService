@@ -1,12 +1,12 @@
 package com.nanum.webfluxservice.chat.infrastructure;
 
-import com.nanum.webfluxservice.alert.domain.Alert;
-import com.nanum.webfluxservice.alert.infrastructure.AlertRepositoryCustom;
+import com.mongodb.client.result.UpdateResult;
 import com.nanum.webfluxservice.chat.domain.Chat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,16 +24,22 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
         return reactiveMongoTemplate.find(query, Chat.class);
     }
 
-    public Mono<Long> countAllReadByUsers(Long userId){
+    @Override
+    public Mono<Long> countAllReadByUsers(Long userId) {
+        return null;
+    }
+
+
+    @Override
+    public Mono<UpdateResult> deleteByUsers(String roomId, String userId) {
         Query query = new Query();
         query.addCriteria(
-                Criteria.where("roomNum")
-                        .and("users").elemMatch(
-                        Criteria.where("userId").is(userId)
-                                .and("readMark").is(false)
-                                .and("delete").is(false)
-                ));
+                Criteria.where("roomId").is(roomId)
+                        .and("users").in(userId)
+        );
+        Update update = new Update();
+        update.pull("users",userId);
 
-        return reactiveMongoTemplate.count(query,Alert.class);
+        return reactiveMongoTemplate.updateMulti(query,update,Chat.class);
     }
 }
