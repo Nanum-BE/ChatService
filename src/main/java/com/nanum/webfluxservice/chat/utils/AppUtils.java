@@ -33,6 +33,23 @@ public class AppUtils {
                 .users(chatDto.getUsers())
                 .build();
     }
+    public static Chat msgToEntityV3(String msg, String roomId, List<String> users, Map<String, Object> fromJson) {
+        String sender = fromJson.get("sender").toString();
+        String type = fromJson.get("type").toString();
+        String username = fromJson.get("username").toString();
+        String updateAt = fromJson.get("createAt").toString();
+        return Chat.builder()
+                .msg(msg)
+                .userId(sender)
+                .delete(false)
+                .type(type)
+                .username(username)
+                .updateAt(updateAt)
+                .createAt(null)
+                .users(users)
+                .roomId(roomId)
+                .build();
+    }
     public static Chat msgToEntityV2(String msg, String roomId, List<String> users){
 
 
@@ -76,7 +93,7 @@ public class AppUtils {
         Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
         String sender = fromJson.get("sender").toString();
         String type = fromJson.get("type").toString();
-     String username = fromJson.get("username").toString();
+        String username = fromJson.get("username").toString();
         String updateAt = fromJson.get("createAt").toString();
         return Chat.builder()
                     .msg(msg)
@@ -215,4 +232,6 @@ public class AppUtils {
                 .roomName(roomRequest.getRoomName())
                 .build();
     }
+
+
 }

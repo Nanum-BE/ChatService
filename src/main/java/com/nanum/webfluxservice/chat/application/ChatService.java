@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ChatService {
 
@@ -23,5 +24,7 @@ public interface ChatService {
     Mono<Void> inRoomByRoomIdAndUserIdAndUserName(String id,String userId, String username);
 
     Mono<Void> outRoomByUserIdAndRoomId(String id,String userId, String username);
+
+    Mono<Chat> addV2(String msg, String roomId, Map<String, Object> fromJson);
 //    Flux<ChatDto> connectedRoom(Long roomId);
 }

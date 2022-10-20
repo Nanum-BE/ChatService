@@ -1,6 +1,8 @@
 package com.nanum.webfluxservice.chat.application;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.nanum.webfluxservice.chat.domain.Chat;
 import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
@@ -25,6 +27,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -42,9 +45,10 @@ public class ChatRoomService implements WebSocketHandler {
     @Override
     public Mono<Void> handle(WebSocketSession session) {
 
-
         Gson gson = new Gson();
-            log.info("init Handle");
+        Map<String, Object> map = new HashMap();
+
+        log.info("init Handle");
         HashMap<String, String> uriInfo = getChatRoomName(session);
         String roomId = uriInfo.get("room");
         Long userId = Long.valueOf(uriInfo.get("userId"));
@@ -58,10 +62,16 @@ public class ChatRoomService implements WebSocketHandler {
         // subscribe
         session.receive()
                 .map(WebSocketMessage::getPayloadAsText)
-                .flatMap(msg->  roomService.updateCountByRoomIdAndMsgAndSendSSE(roomId,msg)
-                                .then(chatService.add(msg,roomId))
-                        ).flatMap(chat-> {
-
+                .flatMap(msg-> {
+                            JsonObject jsonObject = (JsonObject) JsonParser.parseString(msg);
+                            Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
+                            String type = fromJson.get("type").toString();
+                            if(!type.equals("IN")){
+                                return roomService.updateCountByRoomIdAndMsgAndSendSSEV2(roomId, msg, fromJson)
+                                        .then(chatService.addV2(msg,roomId,fromJson));
+                            }
+                                return Mono.just(Chat.builder().msg(msg).users(new ArrayList<>()).build());
+                        }).flatMap(chat-> {
                     String message =  String.format("{\"message\":%s,\"users\": %s }", chat.getMsg(), gson.toJson(chat.getUsers(),List.class));
                     return topic.publish(message);})
                 .doOnError(er->log.error(String.valueOf(er)))

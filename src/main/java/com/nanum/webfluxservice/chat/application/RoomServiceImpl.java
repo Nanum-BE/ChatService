@@ -154,6 +154,51 @@ public class RoomServiceImpl implements RoomService{
                 });
     }
 
+    @Override
+    public Mono<Void> updateCountByRoomIdAndMsgAndSendSSEV2(String id, String msg, Map<String, Object> fromJson) {
+         Long sender = Long.valueOf(fromJson.get("sender").toString());
+        String senderName = fromJson.get("username").toString();
+        String message = fromJson.get("message").toString();
+        String updateAt = fromJson.get("createAt").toString();
+        String type = fromJson.get("type").toString();
+
+        Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
+                .map(room -> {
+                    log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
+                    room.getRoomInfo().setLastMessage(type.equals("IMAGE")?"사진을 보냈습니다.":message);
+                    room.getRoomInfo().setLastSentUserId(sender);
+                    room.getRoomInfo().setLastSentUserName(senderName);
+                    room.getRoomInfo().setUpdateAt(updateAt);
+                    for (int i = 0; i < room.getRoomInfo().getUsers().size(); i++) {
+                        if (!room.getRoomInfo().getUsers().get(i).isConnect()) {
+                            UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
+                            changeUserInfo.setReadCount(changeUserInfo.getReadCount() + 1);
+                            room.getRoomInfo().getUsers().set(i, changeUserInfo);
+                        }
+                    }
+                    return room;
+                }).flatMap(roomRepository::save)
+                .map(room -> {
+                    List<Long> userIds = new ArrayList<>();
+                    for (int i = 0; i < room.getRoomInfo().getUsers().size(); i++) {
+                        if (!room.getRoomInfo().getUsers().get(i).isConnect()) {
+                            userIds.add(room.getRoomInfo().getUsers().get(i).getUserId());
+                        }
+                    }
+                    AlertRequest alertRequest = AlertRequest.builder()
+                            .content(String.format("{\"id\":\"%s\",\"lastMessage\":\"%s\",\"date\":\"%s\"}"
+                                    ,room.getId(),room.getRoomInfo().getLastMessage(),room.getUpdateAt()))
+                            .title("CHAT")
+                            .userIds(userIds)
+                            .url("http://localhost:3000/chat")
+                            .build();
+                    AlertDto alertDto = com.nanum.webfluxservice.alert.utils.AppUtils.voToDto(alertRequest);
+                    return alertDto;
+                });
+
+        return alertService.saveAlert(alertDtoMono).then();
+    }
+
 
     @Override
     public Flux<RoomDto> getRooms() {
@@ -318,6 +363,7 @@ public class RoomServiceImpl implements RoomService{
         String message = fromJson.get("message").toString();
         String updateAt = fromJson.get("createAt").toString();
         String type = fromJson.get("type").toString();
+
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
@@ -351,6 +397,7 @@ public class RoomServiceImpl implements RoomService{
                     AlertDto alertDto = com.nanum.webfluxservice.alert.utils.AppUtils.voToDto(alertRequest);
                     return alertDto;
                 });
+
         return alertService.saveAlert(alertDtoMono).then();
     }
 }
