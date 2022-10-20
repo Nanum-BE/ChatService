@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,10 +47,19 @@ public class ChatServiceImpl implements ChatService{
     }
 
     @Override
-    public Mono<Void> add(String msg,String roomId) {
-
-        return chatRepository.save(AppUtils.msgToEntity(msg,roomId))
-                .then();
+    public Mono<Chat> add(String msg,String roomId) {
+        return roomRepository.findById(roomId)
+                .flatMap(room -> {
+                   List<String> users = new ArrayList<>();
+                    for (UserInfo userInfo:room.getRoomInfo().getUsers()) {
+                        if(!userInfo.isConnect()){
+                            users.add(String.valueOf(userInfo.getUserId()));
+                        }
+                    }
+                    return chatRepository.save(AppUtils.msgToEntityV2(msg, roomId, users));
+                });
+//        return chatRepository.save(AppUtils.msgToEntity(msg,roomId))
+//                .then();
     }
 
     @Override

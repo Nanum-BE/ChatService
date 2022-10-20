@@ -1,14 +1,11 @@
 package com.nanum.webfluxservice.chat.domain;
 
-import com.nanum.webfluxservice.alert.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -36,6 +33,8 @@ public class Chat {
     private String updateAt;
     @CreatedDate
     private LocalDateTime createAt;
+
+    private List<String> users;
 
     private boolean delete;
 }

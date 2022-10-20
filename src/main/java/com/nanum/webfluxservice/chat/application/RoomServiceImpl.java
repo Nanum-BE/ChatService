@@ -65,15 +65,14 @@ public class RoomServiceImpl implements RoomService{
 
                             changeUserInfo.setConnect(true);
                             changeUserInfo.setReadCount(0);
-
-
-
                             room.getRoomInfo().getUsers().set(i,changeUserInfo);
                             break;
                         }
                     }
                     return room;
-                }).flatMap(roomRepository::save).then().subscribe();
+                }).flatMap(roomRepository::save)
+                 .then(chatRepository.deleteByUsers(id, String.valueOf(userId)))
+                 .subscribe();
          return null;
     }
 
