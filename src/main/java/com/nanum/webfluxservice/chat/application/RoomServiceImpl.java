@@ -318,11 +318,11 @@ public class RoomServiceImpl implements RoomService{
         String senderName = fromJson.get("username").toString();
         String message = fromJson.get("message").toString();
         String updateAt = fromJson.get("createAt").toString();
-
+        String type = fromJson.get("type").toString();
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
-                    room.getRoomInfo().setLastMessage(message);
+                    room.getRoomInfo().setLastMessage(type=="IMAGE"?"사진을 보냈습니다.":message);
                     room.getRoomInfo().setLastSentUserId(sender);
                     room.getRoomInfo().setLastSentUserName(senderName);
                     room.getRoomInfo().setUpdateAt(updateAt);
