@@ -321,7 +321,7 @@ public class RoomServiceImpl implements RoomService{
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
-                    room.getRoomInfo().setLastMessage(type=="IMAGE"?"사진을 보냈습니다.":message);
+                    room.getRoomInfo().setLastMessage(type.equals("IMAGE")?"사진을 보냈습니다.":message);
                     room.getRoomInfo().setLastSentUserId(sender);
                     room.getRoomInfo().setLastSentUserName(senderName);
                     room.getRoomInfo().setUpdateAt(updateAt);
