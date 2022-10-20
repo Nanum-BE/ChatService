@@ -1,5 +1,6 @@
 package com.nanum.webfluxservice.chat.application;
 
+import com.google.gson.Gson;
 import com.nanum.webfluxservice.chat.domain.Chat;
 import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
@@ -42,6 +43,7 @@ public class ChatRoomService implements WebSocketHandler {
     public Mono<Void> handle(WebSocketSession session) {
 
 
+        Gson gson = new Gson();
             log.info("init Handle");
         HashMap<String, String> uriInfo = getChatRoomName(session);
         String roomId = uriInfo.get("room");
@@ -53,20 +55,25 @@ public class ChatRoomService implements WebSocketHandler {
         log.info("room: "+ roomId);
 
         RTopicReactive topic = this.client.getTopic(roomId, StringCodec.INSTANCE);
-
         // subscribe
         session.receive()
                 .map(WebSocketMessage::getPayloadAsText)
-                .flatMap(msg-> chatService.add(msg,roomId)
-                        .then(roomService.updateCountByRoomIdAndMsgAndSendSSE(roomId,msg))
-                        .then(topic.publish(msg)))
+                .flatMap(msg->  roomService.updateCountByRoomIdAndMsgAndSendSSE(roomId,msg)
+                                .then(chatService.add(msg,roomId))
+                        ).flatMap(chat-> {
+
+                    String message =  String.format("{\"message\":%s,\"users\": %s }", chat.getMsg(), gson.toJson(chat.getUsers(),List.class));
+                    return topic.publish(message);})
                 .doOnError(er->log.error(String.valueOf(er)))
                 .doFinally(signalType -> log.info("Subscriber finally "+signalType))
                 .subscribe();
 
        // publisher
         Flux<WebSocketMessage> flux = topic.getMessages(String.class)
-                .startWith(chatService.getChatsByRoomIdAndUserId(roomId,userId).map(chat -> chat.getMsg()))
+                .startWith(chatService.getChatsByRoomIdAndUserId(roomId,userId).map(chat -> {
+                    String message =  String.format("{\"message\":%s,\"users\": %s }", chat.getMsg(), gson.toJson(chat.getUsers(),List.class));
+                    return message;
+                }))
                 .map(session::textMessage)
                 .doOnError(er->log.error(String.valueOf(er)))
                 .doFinally(signalType -> {log.info("Publisher finally "+signalType);

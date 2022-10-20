@@ -16,7 +16,7 @@ public interface ChatService {
 
     Flux<Chat> getChatsByRoom(String houseId);
 
-    Mono<Void> add(String msg,String roomId);
+    Mono<Chat> add(String msg,String roomId);
 
     Flux<ChatDto> getChatsByRoomIdAndUserId(String roomId, Long userId);
 

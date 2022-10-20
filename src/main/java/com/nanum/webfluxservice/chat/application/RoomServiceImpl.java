@@ -65,15 +65,14 @@ public class RoomServiceImpl implements RoomService{
 
                             changeUserInfo.setConnect(true);
                             changeUserInfo.setReadCount(0);
-
-
-
                             room.getRoomInfo().getUsers().set(i,changeUserInfo);
                             break;
                         }
                     }
                     return room;
-                }).flatMap(roomRepository::save).then().subscribe();
+                }).flatMap(roomRepository::save)
+                 .then(chatRepository.deleteByUsers(id, String.valueOf(userId)))
+                 .subscribe();
          return null;
     }
 
@@ -322,7 +321,7 @@ public class RoomServiceImpl implements RoomService{
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
-                    room.getRoomInfo().setLastMessage(type=="IMAGE"?"사진을 보냈습니다.":message);
+                    room.getRoomInfo().setLastMessage(type.equals("IMAGE")?"사진을 보냈습니다.":message);
                     room.getRoomInfo().setLastSentUserId(sender);
                     room.getRoomInfo().setLastSentUserName(senderName);
                     room.getRoomInfo().setUpdateAt(updateAt);
