@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -61,7 +62,19 @@ public class ChatServiceImpl implements ChatService{
 //        return chatRepository.save(AppUtils.msgToEntity(msg,roomId))
 //                .then();
     }
-
+    @Override
+    public Mono<Chat> addV2(String msg, String roomId, Map<String, Object> fromJson) {
+        return roomRepository.findById(roomId)
+                .flatMap(room -> {
+                    List<String> users = new ArrayList<>();
+                    for (UserInfo userInfo:room.getRoomInfo().getUsers()) {
+                        if(!userInfo.isConnect()){
+                            users.add(String.valueOf(userInfo.getUserId()));
+                        }
+                    }
+                    return chatRepository.save(AppUtils.msgToEntityV3(msg, roomId, users, fromJson));
+                });
+    }
     @Override
     public Flux<ChatDto> getChatsByRoomIdAndUserId(String roomId, Long userId) {
 
@@ -118,6 +131,7 @@ public class ChatServiceImpl implements ChatService{
             return Mono.error(new RoomNotFoundException("room not"));
         })).then();
     }
+
 
 
     public Mono<Chat> getChatById(String id) {
