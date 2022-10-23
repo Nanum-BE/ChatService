@@ -53,7 +53,8 @@ public class ChatRoomService implements WebSocketHandler {
         String roomId = uriInfo.get("room");
         Long userId = Long.valueOf(uriInfo.get("userId"));
 //        String username = uriInfo.get("username");
-        startChatRoom(roomId, userId);
+        if(session.isOpen())
+        startChatRoom(roomId, userId).subscribe();
 
         log.info("session.getId()"+session.getId());
         log.info("room: "+ roomId);
@@ -100,9 +101,9 @@ public class ChatRoomService implements WebSocketHandler {
     }
 
     private Mono<Void> startChatRoom(String roomId, Long userId) {
-         roomService.updatedConnectRoomByIdByUserId(roomId,userId);
+        return roomService.updatedConnectRoomByIdByUserId(roomId,userId);
 //        roomService.updatedConnectRoomByIdByUserIdV2(roomId,userId, username);
-         return null;
+//         return null;
     }
 
     private HashMap<String,String> getChatRoomName(WebSocketSession session){

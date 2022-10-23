@@ -90,11 +90,11 @@ public class RoomController {
 
     @Operation(summary = "유저별 채팅방 나가기 API", description = "해당 유저의 채팅방 나가기 조회.")
     @DeleteMapping("/{id}/users/{userId}")
-    public Mono<ResponseEntity<RoomDto>> deleteRoomsByUserId(@PathVariable("id") String id,
+    public ResponseEntity<Mono<RoomDto>> deleteRoomsByUserId(@PathVariable("id") String id,
                                             @PathVariable("userId") Long userId){
-        return roomService.deleteRoomByUserId(id, userId)
-                .then(Mono.just(new ResponseEntity<RoomDto>(HttpStatus.NO_CONTENT)))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(roomService.deleteRoomByUserId(id, userId));
+//                .then(Mono.just(new ResponseEntity<RoomDto>(HttpStatus.NO_CONTENT)))
+//                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @Operation(summary = "채팅방 추가 API", description = "해당 유저의 채팅방 초대.")

@@ -56,7 +56,7 @@ public class RoomServiceImpl implements RoomService{
     @Override
     public Mono<Void> updatedConnectRoomByIdByUserId(String id, Long userId) {
         log.info("userInfo--------------"+userId+"::::"+id);
-         roomRepository.findById(id)
+        return roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------"+room.getRoomName()+"::::"+id);
                     for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
@@ -71,9 +71,8 @@ public class RoomServiceImpl implements RoomService{
                     }
                     return room;
                 }).flatMap(roomRepository::save)
-                 .then(chatRepository.deleteByUsers(id, String.valueOf(userId)))
-                 .subscribe();
-         return null;
+                 .then(chatRepository.deleteByUsers(id, String.valueOf(userId))).then();
+
     }
 
     @Override
@@ -165,7 +164,7 @@ public class RoomServiceImpl implements RoomService{
         Mono<AlertDto> alertDtoMono = roomRepository.findById(id)
                 .map(room -> {
                     log.info("userInfo--------------" + room.getRoomName() + "::::" + id);
-                    room.getRoomInfo().setLastMessage(type.equals("IMAGE")?"사진을 보냈습니다.":message);
+                    room.getRoomInfo().setLastMessage(type.equals("IMAGE")?"사진을 보냈습니다.":type.equals("EMOTICON")?"이모티콘을 보냈습니다.":message);
                     room.getRoomInfo().setLastSentUserId(sender);
                     room.getRoomInfo().setLastSentUserName(senderName);
                     room.getRoomInfo().setUpdateAt(updateAt);
@@ -216,11 +215,10 @@ public class RoomServiceImpl implements RoomService{
         return roomRepository.findById(id)
                 .map(AppUtils::entityToDto)
                 .map(roomDto -> {
-                    for (UserInfo userInfo:roomDto.getRoomInfo().getUsers()) {
-                        if(userId==userInfo.getUserId()){
-                            UserInfo findUser = userInfo;
-                            roomDto.getRoomInfo().getUsers().remove(findUser);
-                            break;
+
+                    for (int i =0; i<roomDto.getRoomInfo().getUsers().size(); i++) {
+                        if(userId==roomDto.getRoomInfo().getUsers().get(i).getUserId()){
+                            roomDto.getRoomInfo().getUsers().remove(i);
                         }
                     }
 
