@@ -3,11 +3,13 @@ package com.nanum.webfluxservice.chat.application;
 import com.nanum.webfluxservice.chat.domain.Room;
 import com.nanum.webfluxservice.chat.dto.RoomDto;
 import com.nanum.webfluxservice.chat.vo.RoomResponse;
+import io.swagger.v3.oas.models.media.Schema;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface RoomService {
 
@@ -51,4 +53,6 @@ public interface RoomService {
     Mono<RoomResponse> getRoomByUserIdAndHouseId(List<Long> params, Long houseId);
 
     Mono<HashMap<String,Integer>> countAllRoomsByReadMark(Long userId);
+
+    Mono<Void> updateCountByRoomIdAndMsgAndSendSSEV2(String roomId, String msg, Map<String, Object> fromJson);
 }
