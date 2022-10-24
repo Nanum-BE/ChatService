@@ -46,7 +46,11 @@ dependencies {
 
 //    // s3
 //    implementation('org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE')
-
+//    implementation 'io.micrometer:micrometer-registry-prometheus:1.9.2'
+//    plementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-config', version: '3.0.0'
+//    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.0'
+//    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.7.1'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp:3.0.0'
 }
 
 tasks.named('test') {
