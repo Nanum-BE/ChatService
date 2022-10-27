@@ -189,13 +189,18 @@ public class RoomServiceImpl implements RoomService{
                                     ,room.getId(),room.getRoomInfo().getLastMessage(),room.getUpdateAt()))
                             .title("CHAT")
                             .userIds(userIds)
-                            .url("http://localhost:3000/chat")
+                            .url("http://localhost:3000/chat"+room.getId())
                             .build();
                     AlertDto alertDto = com.nanum.webfluxservice.alert.utils.AppUtils.voToDto(alertRequest);
                     return alertDto;
                 });
 
         return alertService.saveAlert(alertDtoMono).then();
+    }
+
+    @Override
+    public Mono<RoomDto> getHouse(Long houseId) {
+        return roomRepository.findByHouseId(houseId).map(AppUtils::entityToDto);
     }
 
 

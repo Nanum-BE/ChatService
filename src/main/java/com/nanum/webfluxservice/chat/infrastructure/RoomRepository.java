@@ -23,4 +23,5 @@ public interface RoomRepository extends ReactiveMongoRepository<Room, String>, R
     Mono<Boolean> existsByRoomNameAndHouseId(String username, Long houseId);
 
 
+    Mono<Room> findByHouseId(Long houseId);
 }
