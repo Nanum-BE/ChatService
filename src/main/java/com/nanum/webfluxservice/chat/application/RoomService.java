@@ -55,4 +55,6 @@ public interface RoomService {
     Mono<HashMap<String,Integer>> countAllRoomsByReadMark(Long userId);
 
     Mono<Void> updateCountByRoomIdAndMsgAndSendSSEV2(String roomId, String msg, Map<String, Object> fromJson);
+
+    Mono<RoomDto> getHouse(Long houseId);
 }
