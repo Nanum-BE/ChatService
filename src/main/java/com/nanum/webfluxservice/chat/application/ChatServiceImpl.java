@@ -86,7 +86,7 @@ public class ChatServiceImpl implements ChatService{
                 .flatMapMany(room -> {
                     LocalDateTime localDateTime = LocalDateTime.now();
                     for (UserInfo userInfo : room.getRoomInfo().getUsers()) {
-                        if (userInfo.getUserId() == userId) {
+                        if (userInfo.getUserId().equals(userId)) {
                             localDateTime = userInfo.getCreateAt();
                         }
                     }

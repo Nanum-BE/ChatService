@@ -60,7 +60,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(room -> {
                     log.info("userInfo--------------"+room.getRoomName()+"::::"+id);
                     for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
-                        if(room.getRoomInfo().getUsers().get(i).getUserId() == userId){
+                        if(room.getRoomInfo().getUsers().get(i).getUserId().equals(userId)){
                             UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
 
                             changeUserInfo.setConnect(true);
@@ -81,7 +81,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(room -> {
                     log.info("userInfo--------------"+room.getRoomName()+"::::"+id);
                     for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
-                        if(room.getRoomInfo().getUsers().get(i).getUserId() == userId){
+                        if(room.getRoomInfo().getUsers().get(i).getUserId().equals(userId)){
                             UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
                             changeUserInfo.setConnect(false);
                             room.getRoomInfo().getUsers().set(i,changeUserInfo);
@@ -117,18 +117,22 @@ public class RoomServiceImpl implements RoomService{
         return roomRepository.findAllByRoomInfoUsersUserIdAndHouseId(params.get(0),houseId)
                 .collectList()
                 .map(rooms -> {
+                    List<Long> list = params.stream().distinct().collect(Collectors.toList());
+                    Collections.sort(list);
                     for (Room room:rooms) {
-                        List<Long> list = params.stream().distinct().collect(Collectors.toList());
                         List<Long> users = new ArrayList<>();
                         for (UserInfo userInfo:room.getRoomInfo().getUsers()) {
                             users.add(userInfo.getUserId());
                         }
-                        Collections.sort(users);
-                        Collections.sort(list);
-                        boolean result = Arrays.equals(users.toArray(),list.toArray());
-                        if(result){
-                            return AppUtils.entityToVo(room);
+                        if(users.get(0)!=null){
+                            Collections.sort(users);
+                            boolean result = Arrays.equals(users.toArray(),list.toArray());
+                            if(result){
+                                return AppUtils.entityToVo(room);
+                            }
                         }
+
+
                     }
                     return AppUtils.entityToVo(Room.builder().build());
                 });
@@ -142,7 +146,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(rooms -> {
                     for (Room room: rooms) {
                         for (UserInfo userInfo: room.getRoomInfo().getUsers()) {
-                            if(userId == userInfo.getUserId()){
+                            if(userId.equals(userInfo.getUserId())){
                                 count.addAndGet(userInfo.getReadCount());
                             }
                         }
@@ -189,7 +193,7 @@ public class RoomServiceImpl implements RoomService{
                                     ,room.getId(),room.getRoomInfo().getLastMessage(),room.getUpdateAt()))
                             .title("CHAT")
                             .userIds(userIds)
-                            .url("http://localhost:3000/chat"+room.getId())
+                            .url("/chat/"+room.getId())
                             .build();
                     AlertDto alertDto = com.nanum.webfluxservice.alert.utils.AppUtils.voToDto(alertRequest);
                     return alertDto;
@@ -222,7 +226,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(roomDto -> {
 
                     for (int i =0; i<roomDto.getRoomInfo().getUsers().size(); i++) {
-                        if(userId==roomDto.getRoomInfo().getUsers().get(i).getUserId()){
+                        if(userId.equals(roomDto.getRoomInfo().getUsers().get(i).getUserId())){
                             roomDto.getRoomInfo().getUsers().remove(i);
                         }
                     }
@@ -231,7 +235,7 @@ public class RoomServiceImpl implements RoomService{
                 }).map(AppUtils::dtoToEntity)
                 .flatMap(roomRepository::save)
                 .map(room -> {
-                    if(room.getRoomInfo().getUsers()==null || room.getRoomInfo().getUsers().size() == 0){
+                    if(room.getRoomInfo().getUsers().equals(null) || room.getRoomInfo().getUsers().size() == 0){
                         roomRepository.deleteById(id).subscribe();
                     }
                     return AppUtils.entityToDto(room);
@@ -245,7 +249,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(roomDto -> {
                     boolean valid = true;
                     for (UserInfo userInfo:roomDto.getRoomInfo().getUsers()) {
-                        if(userId==userInfo.getUserId()){
+                        if(userId.equals(userInfo.getUserId())){
                             valid = false;
                             break;
                         }
@@ -276,7 +280,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(roomDto -> {
                     boolean valid = true;
                     for (UserInfo userInfo:roomDto.getRoomInfo().getUsers()) {
-                        if(userId==userInfo.getUserId()){
+                        if(userId.equals(userInfo.getUserId())){
                             valid = false;
                             break;
                         }
@@ -310,7 +314,7 @@ public class RoomServiceImpl implements RoomService{
                 .map(room -> {
                     log.info("userInfo--------------"+room.getRoomName()+"::::"+id);
                     for (int i = 0;i<room.getRoomInfo().getUsers().size();i++) {
-                        if(room.getRoomInfo().getUsers().get(i).getUserId() == userId){
+                        if(room.getRoomInfo().getUsers().get(i).getUserId().equals(userId)){
                             UserInfo changeUserInfo = room.getRoomInfo().getUsers().get(i);
                             changeUserInfo.setConnect(true);
                             changeUserInfo.setReadCount(0);

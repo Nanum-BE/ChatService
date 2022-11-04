@@ -88,7 +88,7 @@ public class ChatRoomService implements WebSocketHandler {
                 .map(session::textMessage)
                 .doOnError(er->log.error(String.valueOf(er)))
                 .doFinally(signalType -> {log.info("Publisher finally "+signalType);
-                    if(signalType.toString()=="cancel"){
+                    if(signalType.toString().equals("cancel")){
                      roomService.cancelConnectRoomByIdByUserId(roomId,userId);
                     }
                 });
