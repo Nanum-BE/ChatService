@@ -50,17 +50,9 @@ public class ChatServiceImpl implements ChatService{
     @Override
     public Mono<Chat> add(String msg,String roomId) {
         return roomRepository.findById(roomId)
-                .flatMap(room -> {
-                   List<String> users = new ArrayList<>();
-                    for (UserInfo userInfo:room.getRoomInfo().getUsers()) {
-                        if(!userInfo.isConnect()){
-                            users.add(String.valueOf(userInfo.getUserId()));
-                        }
-                    }
-                    return chatRepository.save(AppUtils.msgToEntityV2(msg, roomId, users));
-                });
-//        return chatRepository.save(AppUtils.msgToEntity(msg,roomId))
-//                .then();
+                .flatMap(room ->
+                     chatRepository.save(AppUtils.msgToEntity(msg, roomId))
+                );
     }
     @Override
     public Mono<Chat> addV2(String msg, String roomId, Map<String, Object> fromJson) {
