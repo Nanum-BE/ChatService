@@ -96,15 +96,15 @@ public class AppUtils {
         String username = fromJson.get("username").toString();
         String updateAt = fromJson.get("createAt").toString();
         return Chat.builder()
-                    .msg(msg)
-                    .userId(sender)
-                    .delete(false)
-                    .type(type)
-                    .username(username)
-                    .updateAt(updateAt)
-                    .createAt(null)
-                    .roomId(roomId)
-                    .build();
+                .msg(msg)
+                .userId(sender)
+                .delete(false)
+                .type(type)
+                .username(username)
+                .updateAt(updateAt)
+                .createAt(null)
+                .roomId(roomId)
+                .build();
 
     }
     public static ChatDto entityToDto(Chat chat){
