@@ -67,9 +67,12 @@ public class ChatRoomService implements WebSocketHandler {
                             JsonObject jsonObject = (JsonObject) JsonParser.parseString(msg);
                             Map<String, Object> fromJson =(Map) gson.fromJson(jsonObject, map.getClass());
                             String type = fromJson.get("type").toString();
-                            if(!type.equals("IN")){
+                            if(!type.equals("IN") && !(type.equals("CHATIN") || type.equals("CHATOUT"))){
                                 return roomService.updateCountByRoomIdAndMsgAndSendSSEV2(roomId, msg, fromJson)
                                         .then(chatService.addV2(msg,roomId,fromJson));
+                            }
+                            if(type.equals("CHATIN") || type.equals("CHATOUT")){
+                                return chatService.add(msg,roomId);
                             }
                                 return Mono.just(Chat.builder().msg(msg).users(new ArrayList<>()).build());
                         }).flatMap(chat-> {
